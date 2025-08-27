@@ -11,7 +11,7 @@ use App\Models\User;
 
 class Kewarganegaraan extends Model
 {
-    // use SoftDeletes, HasLogAktivitas;
+    use SoftDeletes;
 
     protected $table = 'kewarganegaraans';
     protected $guarded = [];
@@ -19,5 +19,20 @@ class Kewarganegaraan extends Model
     public function users()
     {
         return $this->hasMany(User::class, 'kewarganegaraan_id');
+    }
+
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function updatedBy()
+    {
+        return $this->belongsTo(User::class, 'updated_by');
+    }
+
+    public function deletedBy()
+    {
+        return $this->belongsTo(User::class, 'deleted_by');
     }
 }

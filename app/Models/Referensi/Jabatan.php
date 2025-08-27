@@ -9,17 +9,12 @@ use Illuminate\Database\Eloquent\Model;
 // USE MODELS
 use App\Models\User;
 
-class GolonganDarah extends Model
+class Jabatan extends Model
 {
     use SoftDeletes;
 
-    protected $table = 'golongan_darahs';
+    protected $table = 'jabatans';
     protected $guarded = [];
-
-    public function users()
-    {
-        return $this->hasMany(User::class, 'golongan_darah_id');
-    }
 
     public function createdBy()
     {
