@@ -16502,7 +16502,7 @@ a.badge {
 }
 
 .btn {
-  --tblr-btn-icon-size: 1.25rem;
+  --tblr-btn-icon-size: 1rem;
   --tblr-btn-bg: var(--tblr-bg-surface);
   --tblr-btn-color: var(--tblr-body-color);
   --tblr-btn-border-color: var(--tblr-border-color);

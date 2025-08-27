@@ -66,5 +66,34 @@ class ReferensiSeeder extends Seeder
             \App\Models\Referensi\Kewarganegaraan::create($kewarganegaraan);
         }
 
+        // Roles Relations
+        $dataJabatans = [
+            ['name' => 'Rektor', 'Divisi' => 'Pimpinan'],
+            ['name' => 'Wakil Rektor', 'Divisi' => 'Pimpinan'],
+        ];
+
+        // Roles Semester
+        $dataSemesters = [
+            ['name' => 'Semester 1'],
+            ['name' => 'Semester 2'],
+            ['name' => 'Semester 3'],
+            ['name' => 'Semester 4'],
+            ['name' => 'Semester 5'],
+            ['name' => 'Semester 6'],
+            ['name' => 'Semester 7'],
+            ['name' => 'Semester 8'],
+            ['name' => 'Semester 9'],
+            ['name' => 'Semester 10'],
+            ['name' => 'Semester 11'],
+            ['name' => 'Semester 12'],
+            ['name' => 'Semester 13'],
+            ['name' => 'Semester 14'],
+        ];
+
+        foreach ($dataSemesters as $semester)
+        {
+            \App\Models\Referensi\Semester::create($semester);
+        }
+
     }
 }

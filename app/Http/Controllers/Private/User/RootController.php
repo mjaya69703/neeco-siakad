@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 // Use Systems
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Requests\Private\profileRequest;
-use App\Services\Private\profileService;
+use App\Http\Requests\Private\UpdateProfileRequest;
+use App\Services\Private\UpdateProfileService;
+// Use Plugins
+use RealRashid\SweetAlert\Facades\Alert;
 // Use Models
 use App\Models\Pengaturan\Kampus;
 use App\Models\Pengaturan\System;
@@ -34,8 +36,8 @@ class RootController extends Controller
     {
         $user = Auth::user();
         $data['spref'] = $user ? $user->prefix : '';
-        $data['menus'] = 'Dashboard';
-        $data['pages'] = "HomePage";
+        $data['menus'] = 'Profile';
+        $data['pages'] = "Halaman Profile" ;
         $data['system'] = System::first();
         $data['academy'] = Kampus::first();
         // Models
@@ -47,45 +49,25 @@ class RootController extends Controller
         return view('private.profile-index', $data, compact('user'));
     }
 
-    public function handleProfile(profileRequest $request, profileService $service)
+    public function handleProfile(UpdateProfileRequest $request, UpdateProfileService $service)
     {
-        $user = Auth::user();
-        $result = $service->updateProfile($user, $request->validated());
-        
-        if ($result['success']) {
-            return redirect()->back()->with('success', $result['message']);
+        try {
+            $service->updateProfile($request->validated());
+            
+            Alert::toast('Profil berhasil diperbarui', 'success');
+            return redirect()->back();
+            
+        } catch (\Exception $e) {
+            // Log error untuk debugging
+            \Log::error('Profile update error', [
+                'message' => $e->getMessage(),
+                'file'    => $e->getFile(),
+                'line'    => $e->getLine(),
+            ]);
+            
+            Alert::error('Error', 'Gagal memperbarui profil: ' . $e->getMessage());
+            return redirect()->back()->withInput();
         }
-        
-        return redirect()->back()->withErrors($result['message'])->withInput();
     }
 
-    /**
-     * Delete education record
-     */
-    public function deletePendidikan($id, profileService $service)
-    {
-        $user = Auth::user();
-        $result = $service->deleteEducation($id, $user->id);
-        
-        if ($result['success']) {
-            return response()->json(['message' => $result['message']], 200);
-        }
-        
-        return response()->json(['message' => $result['message']], 400);
-    }
-
-    /**
-     * Delete family record
-     */
-    public function deleteKeluarga($id, profileService $service)
-    {
-        $user = Auth::user();
-        $result = $service->deleteFamily($id, $user->id);
-        
-        if ($result['success']) {
-            return response()->json(['message' => $result['message']], 200);
-        }
-        
-        return response()->json(['message' => $result['message']], 400);
-    }
 }

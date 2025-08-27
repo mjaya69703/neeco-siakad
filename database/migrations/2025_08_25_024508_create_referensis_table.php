@@ -23,18 +23,19 @@ return new class extends Migration
             $table->unsignedBigInteger('deleted_by')->nullable();
 
         });
+        
         Schema::create('alamats', function (Blueprint $table) {
             $table->id();
             $table->morphs('owner');
             $table->enum('tipe', ['ktp', 'domisili']);
             $table->text('alamat_lengkap');
-            $table->string('kelurahan');
-            $table->string('kecamatan');
-            $table->string('kota_kabupaten');
-            $table->string('provinsi');
-            $table->string('kode_pos');
-            $table->string('rt');
-            $table->string('rw');
+            $table->string('kelurahan')->nullable();
+            $table->string('kecamatan')->nullable();
+            $table->string('kota_kabupaten')->nullable();
+            $table->string('provinsi')->nullable();
+            $table->string('kode_pos')->nullable();
+            $table->string('rt')->nullable();
+            $table->string('rw')->nullable();
             
             // Audit
             $table->timestamps();
@@ -56,6 +57,21 @@ return new class extends Migration
             $table->unsignedBigInteger('deleted_by')->nullable();
 
         });
+
+        Schema::create('jabatans', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('divisi');
+
+            // Audit
+            $table->timestamps();
+            $table->softDeletes();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
+            $table->unsignedBigInteger('deleted_by')->nullable();
+
+        });
+        
         Schema::create('jenis_kelamins', function (Blueprint $table) {
             $table->id();
             $table->string('name');
@@ -118,6 +134,47 @@ return new class extends Migration
             $table->unsignedBigInteger('deleted_by')->nullable();
 
         });
+
+        Schema::create('roles', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('slug');
+            $table->string('prefix');
+
+            // Audit
+            $table->timestamps();
+            $table->softDeletes();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
+            $table->unsignedBigInteger('deleted_by')->nullable();
+
+        });
+
+        Schema::create('semesters', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+
+            // Audit
+            $table->timestamps();
+            $table->softDeletes();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
+            $table->unsignedBigInteger('deleted_by')->nullable();
+
+        });
+
+        Schema::create('status_mahasiswas', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+
+            // Audit
+            $table->timestamps();
+            $table->softDeletes();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
+            $table->unsignedBigInteger('deleted_by')->nullable();
+
+        });
     }
 
     /**
@@ -128,9 +185,12 @@ return new class extends Migration
         Schema::dropIfExists('agamas');
         Schema::dropIfExists('alamats');
         Schema::dropIfExists('golongan_darahs');
+        Schema::dropIfExists('jabatans');
         Schema::dropIfExists('jenis_kelamins');
         Schema::dropIfExists('kewarganegaraans');
         Schema::dropIfExists('pendidikans');
         Schema::dropIfExists('keluargas');
+        Schema::dropIfExists('semesters');
+        Schema::dropIfExists('status_mahasiswas');
     }
 };

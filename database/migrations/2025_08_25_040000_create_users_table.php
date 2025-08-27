@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             // Relasi Role
+            $table->foreignId('jabatan_id')->nullable()->constrained('jabatans');
             // $table->foreignId('role_id')->constrained('ref_roles')->cascadeOnDelete();
             
             $table->string('name');

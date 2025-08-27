@@ -64,7 +64,7 @@ class AuthController extends Controller
                 if (Auth::attempt([$fieldType => $login, 'password' => $request->input('password')])) {
                     if (Auth::user()->prefix === Auth::user()->prefix) {
                         Alert::toast('Kamu telah berhasil login sebagai ' . Auth::user()->name, 'success');
-                        return redirect()->route('dashboard-render');
+                        return redirect()->route('dashboard-index');
                     }
     
                 } else {
@@ -88,6 +88,19 @@ class AuthController extends Controller
     
             // Tampilkan pesan error user-friendly
             Alert::error('Error', 'Terjadi kesalahan sistem. Silakan coba lagi.');
+            return back();
+        }
+    }
+    
+    public function handleLogout(Request $request) {
+        if (Auth::check()) {
+
+            Auth::logout();
+            Alert::success('Berhasil!', 'Logout telah sukses!');
+            return redirect()->route('auth.render-signin');
+        } else {
+
+            Alert::error('Gagal!', 'Logout gagal, Silahkan coba lagi!');
             return back();
         }
     }
