@@ -13,6 +13,12 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'auth' => \App\Http\Middleware\Authenticate::class,
+            'maintenance' => \App\Http\Middleware\CheckForMaintenanceMode::class,
+        ]);
+        
+        // Tambahkan middleware maintenance mode ke grup web
+        $middleware->web(append: [
+            \App\Http\Middleware\CheckForMaintenanceMode::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

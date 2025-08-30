@@ -17,6 +17,9 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/profile/pendidikan/{id}', [App\Http\Controllers\Private\User\RootController::class, 'deletePendidikan'])->name('profile.delete-pendidikan');
     Route::delete('/profile/keluarga/{id}', [App\Http\Controllers\Private\User\RootController::class, 'deleteKeluarga'])->name('profile.delete-keluarga');
     
+    Route::get('/pengaturan', [App\Http\Controllers\PengaturanController::class, 'index'])->name('pengaturan-index');
+    Route::post('/pengaturan', [App\Http\Controllers\PengaturanController::class, 'update'])->name('pengaturan-update');
+    
     // Master Data Referensi
     Route::get('/referensi', [App\Http\Controllers\RootController::class, 'indexReferensi'])->name('referensi-index');
     Route::get('/referensi/agama', [App\Http\Controllers\Referensi\AgamaController::class, 'index'])->name('referensi.agama-index');

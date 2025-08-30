@@ -18,7 +18,7 @@ return new class extends Migration
             $table->enum('semester', ['Ganjil', 'Genap', 'Pendek'])->default('Ganjil');
             $table->date('tanggal_mulai');
             $table->date('tanggal_selesai');
-            $table->boolean('is_active')->default('false');
+            $table->boolean('is_active')->default(false);
 
             // Audit
             $table->timestamps();
@@ -49,7 +49,7 @@ return new class extends Migration
             $table->string('telepon', 20)->nullable();
             $table->text('alamat')->nullable();
             
-            $table->boolean('is_active')->default('true');
+            $table->boolean('is_active')->default(true);
 
             // Audit
             $table->timestamps();
@@ -104,7 +104,7 @@ return new class extends Migration
             $table->foreignId('kaprodi_id')->nullable()->constrained('users');
             $table->foreignId('sekretaris_id')->nullable()->constrained('users');
 
-            $table->boolean('is_active')->default('true');
+            $table->boolean('is_active')->default(true);
 
             // Audit
             $table->timestamps();
@@ -174,31 +174,39 @@ return new class extends Migration
 
         Schema::create('mata_kuliah', function (Blueprint $table) {
             $table->id();
-            // Relasi inti
-            $table->foreignId('kurikulum_id')->constrained('kurikulum');
 
-            // Identitas kurikulum
+            // Identitas mata kuliah
             $table->string('name');
-            $table->string('code', 20)->unique();
-            $table->text('deskripsi')->nullable();
-
-            // Periode berlaku
-            $table->year('tahun_berlaku');              
-            $table->year('tahun_berakhir')->nullable(); 
-            $table->foreignId('awal_tahun_akademik_id')->constrained('tahun_akademik');
-            $table->foreignId('akhir_tahun_akademik_id')->constrained('tahun_akademik');
-
-            // Ketentuan akademik
-            $table->integer('total_sks_lulus')->default(144);
-            $table->integer('sks_wajib')->default(0);
-            $table->integer('sks_pilihan')->default(0);
-            $table->integer('semester_normal')->default(8);
-            $table->decimal('ipk_minimal', 3, 2)->default(2.00);
-
-            // Dokumen & status
-            $table->string('sk_penetapan')->nullable();
-            $table->date('tanggal_sk')->nullable();
-            $table->enum('status', ['Masih Berlaku', 'Tidak Berlaku'])->default('Masih Berlaku');
+            $table->string('name_en')->nullable();
+            $table->string('code')->unique();
+            $table->string('cover')->default('default-mk.jpg');
+            
+            // SKS dan jenis
+            $table->integer('beban_sks');
+            $table->integer('sks_teori')->default(0);
+            $table->integer('sks_praktik')->default(0);
+            $table->integer('sks_lapangan')->default(0);
+            $table->enum('jenis', ['Wajib', 'Pilihan', 'MKWU', 'MKU']);
+            
+            // Kategori dan kelompok
+            $table->enum('kategori', ['Dasar', 'Inti', 'Pendukung', 'Pilihan', 'Lainnya'])->default('Inti');
+            $table->string('kelompok_mk')->nullable();
+            
+            // Prasyarat
+            $table->json('prasyarat_mk_ids')->nullable(); // Array of mata kuliah IDs
+            $table->integer('min_semester')->default(1);
+            $table->decimal('min_ipk', 3, 2)->default(0.00);
+            
+            // Konten dan evaluasi
+            $table->longText('deskripsi');
+            $table->longText('capaian_pembelajaran')->nullable();
+            $table->longText('materi_pokok')->nullable();
+            $table->json('metode_pembelajaran')->nullable();
+            $table->json('metode_penilaian')->nullable();
+            
+            // Status dan akreditasi
+            $table->boolean('is_active')->default(true);
+            $table->enum('status_akreditasi', ['A', 'B', 'C', 'Belum Terakreditasi'])->nullable();
 
             // Audit fields
             $table->timestamps();
@@ -207,6 +215,31 @@ return new class extends Migration
             $table->unsignedBigInteger('updated_by')->nullable();
             $table->unsignedBigInteger('deleted_by')->nullable();
         });
+        
+        Schema::create('kurikulum_mata_kuliah', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('kurikulum_id')->constrained('kurikulum')->onDelete('cascade');
+            $table->foreignId('mata_kuliah_id')->constrained('mata_kuliah')->onDelete('cascade');
+            
+            // Penempatan dalam kurikulum
+            $table->integer('semester');
+            $table->boolean('is_wajib')->default(true);
+            $table->integer('urutan')->default(0);
+            
+            // Override properties for this curriculum
+            $table->integer('sks_override')->nullable();
+            $table->text('catatan')->nullable();
+            
+            // Audit
+            $table->timestamps();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
+            
+            // Unique constraint
+            $table->unique(['kurikulum_id', 'mata_kuliah_id']);
+        });
+
+
     }
 
     /**
@@ -219,5 +252,8 @@ return new class extends Migration
         Schema::dropIfExists('fakultas_profile');
         Schema::dropIfExists('program_studi');
         Schema::dropIfExists('program_studi_profile');
+        Schema::dropIfExists('kurikulum');
+        Schema::dropIfExists('mata_kuliah');
+        Schema::dropIfExists('kurikulum_mata_kuliah');
     }
 };

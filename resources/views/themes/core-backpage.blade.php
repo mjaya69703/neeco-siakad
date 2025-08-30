@@ -266,6 +266,7 @@
                 </div>
                 <div class="collapse navbar-collapse" id="sidebar-menu">
                     <!-- BEGIN NAVBAR MENU -->
+                    @include('themes.partials.sidebar-user')
                     <!-- END NAVBAR MENU -->
                 </div>
             </div>

@@ -1,0 +1,554 @@
+        // === DOSEN & STAFF AKADEMIK ===
+        Schema::create('dosen', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('fakultas_id')->nullable()->constrained('fakultas');
+            
+            // Identitas dosen
+            $table->string('nidn', 20)->unique()->nullable();
+            $table->string('nip', 30)->unique()->nullable();
+            $table->string('nuptk', 20)->unique()->nullable();
+            
+            // Status kepegawaian
+            $table->enum('status_pegawai', ['PNS', 'PPPK', 'Kontrak', 'Honorer', 'Tidak Tetap']);
+            $table->enum('status_keaktifan', ['Aktif', 'Tidak Aktif', 'Cuti', 'Tugas Belajar']);
+            $table->date('tanggal_mulai_kerja')->nullable();
+            $table->date('tanggal_berakhir_kontrak')->nullable();
+            
+            // Kepangkatan dan golongan
+            $table->string('pangkat')->nullable();
+            $table->string('golongan')->nullable();
+            $table->string('jabatan_fungsional')->nullable();
+            $table->string('jabatan_struktural')->nullable();
+            
+            // Pendidikan
+            $table->enum('pendidikan_terakhir', ['S1', 'S2', 'S3', 'Profesi', 'Sp-1', 'Sp-2']);
+            $table->string('gelar_depan')->nullable();
+            $table->string('gelar_belakang')->nullable();
+            $table->string('bidang_keahlian')->nullable();
+            $table->json('sertifikat_profesi')->nullable();
+            
+            // Penelitian dan pengabdian
+            $table->integer('jumlah_penelitian')->default(0);
+            $table->integer('jumlah_pengabdian')->default(0);
+            $table->integer('jumlah_publikasi')->default(0);
+            $table->decimal('h_index', 5, 2)->default(0);
+            
+            // Beban mengajar
+            $table->integer('beban_kerja_minimal')->default(12); // SKS
+            $table->integer('beban_kerja_maksimal')->default(16); // SKS
+            
+            $table->boolean('is_active')->default(true);
+
+            // Audit
+            $table->timestamps();
+            $table->softDeletes();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
+            $table->unsignedBigInteger('deleted_by')->nullable();
+        });
+
+        // === MAHASISWA ===
+        Schema::create('mahasiswa', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            
+            // Identitas mahasiswa
+            $table->string('nim', 20)->unique();
+            $table->string('nisn', 20)->nullable();
+            $table->string('nik', 20)->nullable();
+            
+            // Status akademik
+            $table->enum('status_mahasiswa', ['Aktif', 'Cuti', 'Non-Aktif', 'Lulus', 'DO', 'Mengundurkan Diri', 'Meninggal']);
+            $table->date('tanggal_masuk');
+            $table->date('tanggal_lulus')->nullable();
+            $table->date('tanggal_yudisium')->nullable();
+            $table->integer('angkatan');
+            
+            // Jalur masuk dan biaya
+            $table->enum('jalur_masuk', ['SNMPTN', 'SBMPTN', 'Mandiri', 'Transfer', 'RPL', 'Lainnya']);
+            $table->enum('jenis_pembiayaan', ['Biaya Sendiri', 'Beasiswa Penuh', 'Beasiswa Parsial', 'Bantuan', 'Lainnya']);
+            $table->string('sumber_biaya')->nullable();
+            
+            // Akademik
+            $table->decimal('ipk', 3, 2)->default(0.00);
+            $table->integer('total_sks_lulus')->default(0);
+            $table->integer('semester_studi')->default(1);
+            $table->integer('semester_max')->default(14);
+            
+            // Kelulusan
+            $table->string('no_ijazah')->nullable();
+            $table->date('tanggal_ijazah')->nullable();
+            $table->string('judul_skripsi')->nullable();
+            $table->decimal('nilai_skripsi', 5, 2)->nullable();
+            $table->enum('predikat_lulus', ['Cum Laude', 'Sangat Memuaskan', 'Memuaskan', 'Cukup'])->nullable();
+            
+            $table->boolean('is_active')->default(true);
+
+            // Audit
+            $table->timestamps();
+            $table->softDeletes();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
+            $table->unsignedBigInteger('deleted_by')->nullable();
+        });
+        
+        Schema::create('mahasiswa_program_studi', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('mahasiswa_id')->constrained('mahasiswa')->onDelete('cascade');
+            $table->foreignId('program_studi_id')->constrained('program_studi');
+            $table->foreignId('kurikulum_id')->constrained('kurikulum');
+            
+            // Status di program studi
+            $table->enum('status', ['Aktif', 'Pindah', 'Lulus', 'DO', 'Cuti'])->default('Aktif');
+            $table->date('tanggal_masuk');
+            $table->date('tanggal_keluar')->nullable();
+            $table->text('keterangan')->nullable();
+            
+            // Pembimbing akademik
+            $table->foreignId('dosen_pa_id')->nullable()->constrained('dosen');
+            
+            // Audit
+            $table->timestamps();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
+            
+            $table->unique(['mahasiswa_id', 'program_studi_id']);
+        });
+
+        // === KELAS & JADWAL ===
+        Schema::create('kelas', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('mata_kuliah_id')->constrained('mata_kuliah');
+            $table->foreignId('program_studi_id')->constrained('program_studi');
+            $table->foreignId('tahun_akademik_id')->constrained('tahun_akademik');
+            $table->foreignId('dosen_id')->constrained('dosen'); // Dosen pengampu utama
+            
+            $table->string('name'); // Nama kelas (A, B, C, dll)
+            $table->string('code')->unique(); // Kode unik kelas
+            $table->integer('semester'); // Semester berapa mata kuliah ini
+            $table->integer('kapasitas');
+            $table->integer('jumlah_mahasiswa')->default(0);
+            
+            // Jadwal ringkas
+            $table->enum('hari', ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'])->nullable();
+            $table->time('jam_mulai')->nullable();
+            $table->time('jam_selesai')->nullable();
+            $table->foreignId('ruangan_id')->nullable()->constrained('ruangan');
+            
+            $table->enum('status', ['Buka', 'Tutup', 'Batal'])->default('Buka');
+            $table->boolean('is_active')->default(true);
+            
+            // Audit
+            $table->timestamps();
+            $table->softDeletes();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
+            $table->unsignedBigInteger('deleted_by')->nullable();
+        });
+        
+        Schema::create('kelas_dosen', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('kelas_id')->constrained('kelas')->onDelete('cascade');
+            $table->foreignId('dosen_id')->constrained('dosen')->onDelete('cascade');
+            $table->enum('peran', ['Pengampu Utama', 'Pengampu', 'Asisten', 'Observer']);
+            $table->decimal('persentase_mengajar', 5, 2)->default(100.00);
+            
+            $table->timestamps();
+            $table->unique(['kelas_id', 'dosen_id']);
+        });
+        
+        Schema::create('jadwal_kuliah', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('kelas_id')->constrained('kelas');
+            $table->foreignId('ruangan_id')->constrained('ruangan');
+            
+            $table->enum('hari', ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu']);
+            $table->time('jam_mulai');
+            $table->time('jam_selesai');
+            $table->integer('pertemuan_ke')->default(1);
+            $table->date('tanggal_kuliah')->nullable();
+            
+            // Jenis pertemuan
+            $table->enum('jenis_pertemuan', ['Teori', 'Praktikum', 'Seminar', 'Ujian', 'Presentasi', 'Lainnya'])->default('Teori');
+            $table->string('topik_bahasan')->nullable();
+            $table->text('keterangan')->nullable();
+            
+            $table->enum('status', ['Terjadwal', 'Berlangsung', 'Selesai', 'Batal', 'Ditunda'])->default('Terjadwal');
+            $table->boolean('is_active')->default(true);
+            
+            // Audit
+            $table->timestamps();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
+        });
+
+        // === KRS & ENROLLMENT ===
+        Schema::create('krs', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('mahasiswa_id')->constrained('mahasiswa')->onDelete('cascade');
+            $table->foreignId('tahun_akademik_id')->constrained('tahun_akademik');
+            $table->foreignId('dosen_pa_id')->nullable()->constrained('dosen'); // Pembimbing Akademik
+            
+            $table->integer('semester');
+            $table->integer('total_sks')->default(0);
+            $table->decimal('ipk_sebelumnya', 3, 2)->default(0.00);
+            $table->integer('total_sks_sebelumnya')->default(0);
+            
+            // Batas SKS berdasarkan IPK
+            $table->integer('max_sks_diizinkan')->default(24);
+            $table->text('keterangan')->nullable();
+            
+            // Status dan persetujuan
+            $table->enum('status', ['Draft', 'Diajukan', 'Disetujui PA', 'Ditolak PA', 'Disetujui Final', 'Batal'])->default('Draft');
+            $table->timestamp('tanggal_pengajuan')->nullable();
+            $table->timestamp('tanggal_persetujuan_pa')->nullable();
+            $table->timestamp('tanggal_persetujuan_final')->nullable();
+            $table->text('catatan_pa')->nullable();
+            $table->text('catatan_akademik')->nullable();
+            
+            // Audit
+            $table->timestamps();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
+            
+            $table->unique(['mahasiswa_id', 'tahun_akademik_id']);
+        });
+        
+        Schema::create('krs_detail', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('krs_id')->constrained('krs')->onDelete('cascade');
+            $table->foreignId('kelas_id')->constrained('kelas');
+            
+            $table->integer('sks');
+            $table->enum('status', ['Aktif', 'Batal', 'Pindah Kelas'])->default('Aktif');
+            $table->timestamp('tanggal_daftar')->useCurrent();
+            $table->timestamp('tanggal_batal')->nullable();
+            $table->text('keterangan')->nullable();
+            
+            // Nilai akhir (diisi setelah semester selesai)
+            $table->decimal('nilai_angka', 5, 2)->nullable();
+            $table->enum('nilai_huruf', ['A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'E'])->nullable();
+            $table->decimal('bobot', 3, 2)->nullable();
+            $table->boolean('is_lulus')->default(false);
+            
+            // Audit
+            $table->timestamps();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
+            
+            $table->unique(['krs_id', 'kelas_id']);
+        });
+
+        // === PRESENSI ===
+        Schema::create('presensi', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('jadwal_kuliah_id')->constrained('jadwal_kuliah');
+            $table->foreignId('mahasiswa_id')->constrained('mahasiswa');
+            
+            $table->enum('status', ['Hadir', 'Tidak Hadir', 'Izin', 'Sakit', 'Alfa', 'Terlambat']);
+            $table->time('jam_presensi')->nullable();
+            $table->text('keterangan')->nullable();
+            
+            // Lokasi presensi (jika menggunakan GPS)
+            $table->decimal('latitude', 10, 8)->nullable();
+            $table->decimal('longitude', 11, 8)->nullable();
+            $table->string('metode_presensi')->nullable(); // Manual, QR Code, Face Recognition, etc
+            
+            $table->timestamps();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
+            
+            $table->unique(['jadwal_kuliah_id', 'mahasiswa_id']);
+        });
+
+        // === PENILAIAN & EVALUASI ===
+        Schema::create('komponen_nilai', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('kelas_id')->constrained('kelas')->onDelete('cascade');
+            
+            $table->string('name'); // UTS, UAS, Tugas 1, Quiz, dll
+            $table->enum('jenis', ['UTS', 'UAS', 'Tugas', 'Quiz', 'Praktikum', 'Projekt', 'Presentasi', 'Partisipasi', 'Lainnya']);
+            $table->decimal('bobot', 5, 2); // Persentase dari total nilai (0-100)
+            $table->integer('urutan')->default(1);
+            
+            $table->date('tanggal_pelaksanaan')->nullable();
+            $table->time('jam_mulai')->nullable();
+            $table->time('jam_selesai')->nullable();
+            $table->foreignId('ruangan_id')->nullable()->constrained('ruangan');
+            
+            $table->text('deskripsi')->nullable();
+            $table->json('materi_ujian')->nullable(); // Array materi yang diujikan
+            $table->enum('status', ['Draft', 'Aktif', 'Selesai', 'Batal'])->default('Draft');
+            
+            $table->timestamps();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
+        });
+        
+        Schema::create('nilai', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('komponen_nilai_id')->constrained('komponen_nilai')->onDelete('cascade');
+            $table->foreignId('mahasiswa_id')->constrained('mahasiswa')->onDelete('cascade');
+            
+            $table->decimal('nilai', 5, 2)->nullable(); // 0-100
+            $table->text('keterangan')->nullable();
+            $table->timestamp('tanggal_input')->nullable();
+            $table->foreignId('dosen_penilai_id')->nullable()->constrained('dosen');
+            
+            // Status penilaian
+            $table->enum('status', ['Draft', 'Final', 'Revisi'])->default('Draft');
+            $table->timestamp('tanggal_finalisasi')->nullable();
+            
+            $table->timestamps();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
+            
+            $table->unique(['komponen_nilai_id', 'mahasiswa_id']);
+        });
+        
+        // === KARTU HASIL STUDI (KHS) ===
+        Schema::create('khs', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('mahasiswa_id')->constrained('mahasiswa')->onDelete('cascade');
+            $table->foreignId('tahun_akademik_id')->constrained('tahun_akademik');
+            
+            $table->integer('semester');
+            $table->integer('total_sks_semester');
+            $table->integer('total_sks_kumulatif');
+            $table->decimal('ips', 3, 2)->default(0.00); // Indeks Prestasi Semester
+            $table->decimal('ipk', 3, 2)->default(0.00); // Indeks Prestasi Kumulatif
+            
+            // Statistik semester
+            $table->integer('jumlah_mk_lulus')->default(0);
+            $table->integer('jumlah_mk_tidak_lulus')->default(0);
+            $table->integer('jumlah_mk_mengulang')->default(0);
+            
+            // Status akademik
+            $table->enum('status_semester', ['Normal', 'Peringatan', 'Probasi', 'Putus Studi'])->default('Normal');
+            $table->text('catatan_akademik')->nullable();
+            
+            // Persetujuan
+            $table->enum('status', ['Draft', 'Disetujui', 'Final'])->default('Draft');
+            $table->timestamp('tanggal_persetujuan')->nullable();
+            $table->foreignId('disetujui_oleh')->nullable()->constrained('users');
+            
+            $table->timestamps();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
+            
+            $table->unique(['mahasiswa_id', 'tahun_akademik_id']);
+        });
+        
+        Schema::create('khs_detail', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('khs_id')->constrained('khs')->onDelete('cascade');
+            $table->foreignId('mata_kuliah_id')->constrained('mata_kuliah');
+            $table->foreignId('kelas_id')->nullable()->constrained('kelas');
+            
+            $table->integer('sks');
+            $table->decimal('nilai_angka', 5, 2)->nullable();
+            $table->enum('nilai_huruf', ['A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'E'])->nullable();
+            $table->decimal('bobot', 3, 2)->nullable();
+            $table->decimal('mutu', 5, 2)->nullable(); // SKS x Bobot
+            
+            $table->enum('status', ['Lulus', 'Tidak Lulus', 'Mengulang']);
+            $table->text('keterangan')->nullable();
+            
+            $table->timestamps();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
+        });
+
+        // === TUGAS & ASSIGNMENT ===
+        Schema::create('tugas_kuliah', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('kelas_id')->constrained('kelas')->onDelete('cascade');
+            $table->foreignId('dosen_id')->constrained('dosen');
+            
+            $table->string('judul');
+            $table->longText('deskripsi');
+            $table->enum('jenis', ['Individu', 'Kelompok', 'Praktikum', 'Proyek', 'Essai', 'Presentasi']);
+            
+            // Deadline dan submisi
+            $table->timestamp('tanggal_pemberian');
+            $table->timestamp('deadline');
+            $table->timestamp('deadline_revisi')->nullable();
+            $table->boolean('allow_late_submission')->default(false);
+            $table->integer('max_late_days')->default(0);
+            $table->decimal('penalty_per_day', 5, 2)->default(0.00);
+            
+            // File dan format
+            $table->json('format_file_allowed')->nullable(); // pdf, doc, zip, etc
+            $table->integer('max_file_size_mb')->default(10);
+            $table->integer('max_files')->default(1);
+            
+            // Penilaian
+            $table->decimal('bobot_nilai', 5, 2)->default(0.00);
+            $table->json('rubrik_penilaian')->nullable();
+            
+            $table->enum('status', ['Draft', 'Aktif', 'Selesai', 'Batal'])->default('Draft');
+            $table->boolean('is_visible')->default(true);
+            
+            $table->timestamps();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
+        });
+        
+        Schema::create('submisi_tugas', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('tugas_kuliah_id')->constrained('tugas_kuliah')->onDelete('cascade');
+            $table->foreignId('mahasiswa_id')->constrained('mahasiswa')->onDelete('cascade');
+            
+            $table->text('konten_submisi')->nullable();
+            $table->json('file_submisi')->nullable(); // Array file paths
+            $table->timestamp('tanggal_submisi');
+            $table->timestamp('tanggal_revisi')->nullable();
+            $table->boolean('is_late')->default(false);
+            $table->integer('days_late')->default(0);
+            
+            // Penilaian
+            $table->decimal('nilai', 5, 2)->nullable();
+            $table->text('feedback_dosen')->nullable();
+            $table->timestamp('tanggal_dinilai')->nullable();
+            $table->foreignId('dinilai_oleh')->nullable()->constrained('dosen');
+            
+            $table->enum('status', ['Submitted', 'Graded', 'Revision Required', 'Final'])->default('Submitted');
+            
+            $table->timestamps();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
+            
+            $table->unique(['tugas_kuliah_id', 'mahasiswa_id']);
+        });
+
+        // === UJIAN ===
+        Schema::create('ujian', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('kelas_id')->constrained('kelas')->onDelete('cascade');
+            $table->foreignId('mata_kuliah_id')->constrained('mata_kuliah');
+            
+            $table->string('nama_ujian');
+            $table->enum('jenis_ujian', ['UTS', 'UAS', 'Quiz', 'Ujian Susulan', 'Ujian Luar Biasa']);
+            $table->text('deskripsi')->nullable();
+            
+            // Jadwal ujian
+            $table->date('tanggal_ujian');
+            $table->time('jam_mulai');
+            $table->time('jam_selesai');
+            $table->integer('durasi_menit');
+            $table->foreignId('ruangan_id')->constrained('ruangan');
+            
+            // Pengaturan ujian
+            $table->enum('jenis_soal', ['Pilihan Ganda', 'Essai', 'Campuran', 'Praktikum', 'Lisan']);
+            $table->integer('jumlah_soal')->nullable();
+            $table->json('materi_ujian')->nullable();
+            $table->boolean('open_book')->default(false);
+            $table->text('ketentuan_khusus')->nullable();
+            
+            // Pengawas
+            $table->json('pengawas_ids')->nullable(); // Array of dosen IDs
+            
+            $table->enum('status', ['Draft', 'Aktif', 'Berlangsung', 'Selesai', 'Batal'])->default('Draft');
+            
+            $table->timestamps();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
+        });
+        
+        Schema::create('nilai_ujian', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('ujian_id')->constrained('ujian')->onDelete('cascade');
+            $table->foreignId('mahasiswa_id')->constrained('mahasiswa')->onDelete('cascade');
+            
+            $table->decimal('nilai', 5, 2)->nullable();
+            $table->text('keterangan')->nullable();
+            $table->timestamp('tanggal_koreksi')->nullable();
+            $table->foreignId('dikoreksi_oleh')->nullable()->constrained('dosen');
+            
+            // Kehadiran ujian
+            $table->enum('status_kehadiran', ['Hadir', 'Tidak Hadir', 'Sakit', 'Izin']);
+            $table->time('jam_masuk')->nullable();
+            $table->time('jam_keluar')->nullable();
+            
+            $table->enum('status', ['Draft', 'Final'])->default('Draft');
+            
+            $table->timestamps();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
+            
+            $table->unique(['ujian_id', 'mahasiswa_id']);
+        });
+
+        // === KONSELING & BIMBINGAN ===
+        Schema::create('konseling', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('mahasiswa_id')->constrained('mahasiswa')->onDelete('cascade');
+            $table->foreignId('dosen_id')->constrained('dosen'); // Konselor/PA
+            
+            $table->enum('jenis', ['Akademik', 'Personal', 'Karir', 'Finansial', 'Lainnya']);
+            $table->string('topik');
+            $table->longText('keluhan_masalah');
+            $table->longText('saran_solusi')->nullable();
+            $table->longText('tindak_lanjut')->nullable();
+            
+            $table->date('tanggal_konseling');
+            $table->time('jam_mulai')->nullable();
+            $table->time('jam_selesai')->nullable();
+            $table->enum('metode', ['Tatap Muka', 'Online', 'Telepon', 'Chat'])->default('Tatap Muka');
+            
+            $table->enum('status', ['Terjadwal', 'Selesai', 'Batal', 'Reschedule'])->default('Terjadwal');
+            $table->enum('tingkat_urgensi', ['Rendah', 'Sedang', 'Tinggi', 'Sangat Tinggi'])->default('Sedang');
+            
+            $table->boolean('perlu_tindak_lanjut')->default(false);
+            $table->date('tanggal_tindak_lanjut')->nullable();
+            
+            $table->timestamps();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
+        });
+
+        // === SKRIPSI & TUGAS AKHIR ===
+        Schema::create('skripsi', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('mahasiswa_id')->constrained('mahasiswa')->onDelete('cascade');
+            $table->foreignId('program_studi_id')->constrained('program_studi');
+            $table->foreignId('pembimbing1_id')->constrained('dosen');
+            $table->foreignId('pembimbing2_id')->nullable()->constrained('dosen');
+            
+            $table->string('judul');
+            $table->string('judul_en')->nullable();
+            $table->longText('abstrak')->nullable();
+            $table->longText('abstrak_en')->nullable();
+            $table->json('kata_kunci')->nullable();
+            $table->json('keywords')->nullable();
+            
+            // Bidang penelitian
+            $table->string('bidang_penelitian');
+            $table->string('metodologi')->nullable();
+            $table->text('ruang_lingkup')->nullable();
+            
+            // Proposal
+            $table->date('tanggal_pengajuan_proposal')->nullable();
+            $table->date('tanggal_seminar_proposal')->nullable();
+            $table->enum('status_proposal', ['Draft', 'Diajukan', 'Disetujui', 'Revisi', 'Ditolak'])->default('Draft');
+            
+            // Penelitian
+            $table->date('tanggal_mulai_penelitian')->nullable();
+            $table->date('tanggal_selesai_penelitian')->nullable();
+            $table->integer('durasi_penelitian_bulan')->nullable();
+            
+            // Sidang
+            $table->date('tanggal_sidang')->nullable();
+            $table->time('jam_sidang')->nullable();
+            $table->foreignId('ruangan_sidang_id')->nullable()->constrained('ruangan');
+            $table->json('penguji_ids')->nullable(); // Array of dosen IDs
+            $table->decimal('nilai_sidang', 5, 2)->nullable();
+            $table->enum('hasil_sidang', ['Lulus', 'Lulus dengan Perbaikan', 'Tidak Lulus'])->nullable();
+            
+            $table->enum('status', ['Pengajuan Judul', 'Proposal', 'Penelitian', 'Penulisan', 'Sidang', 'Selesai'])->default('Pengajuan Judul');
+            
+            $table->timestamps();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
+        });

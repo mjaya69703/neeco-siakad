@@ -16,6 +16,17 @@ class System extends Model
     protected $table = 'systems';
     protected $guarded = [];
 
-
+    public function getAppFaviconAttribute($value)
+    {
+        return $value == 'default.jpg' ? asset('storage/images/logo/logo-vertikal.jpg') : asset('storage/images/logo/' . $value);
+    }
+    public function getAppLogoVertikalAttribute($value)
+    {
+        return $value == 'default.jpg' ? asset('storage/images/logo/logo-vertikal.jpg') : asset('storage/images/logo/' . $value);
+    }
+    public function getAppLogoHorizontalAttribute($value)
+    {
+        return $value == 'default.jpg' ? asset('storage/images/logo/logo-horizontal.jpg') : asset('storage/images/logo/' . $value);
+    }
     
 }

@@ -29,7 +29,7 @@ class AuthController extends Controller
         return view('themes.auth.auth-signin', $data, compact('user'));
     }
 
-        public function handleSignin(Request $request)
+    public function handleSignin(Request $request)
     {
         try {
             $request->validate([
