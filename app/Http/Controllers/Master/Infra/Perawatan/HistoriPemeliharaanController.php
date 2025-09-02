@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Master\Perawatan;
+namespace App\Http\Controllers\Master\Infra\Inventaris;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -31,7 +31,7 @@ class HistoriPemeliharaanController extends Controller
         $data['users'] = User::orderBy('name')->get();
         $data['is_trash'] = false;
 
-        return view('master.perawatan.histori-index', $data, compact('user'));
+        return view('master.infra.perawatan.histori-index', $data, compact('user'));
     }
 
     public function trash()
@@ -48,7 +48,7 @@ class HistoriPemeliharaanController extends Controller
         $data['users'] = User::orderBy('name')->get();
         $data['is_trash'] = true;
 
-        return view('master.perawatan.histori-index', $data, compact('user'));
+        return view('master.infra.perawatan.histori-index', $data, compact('user'));
     }
 
     public function store(Request $request)

@@ -12,6 +12,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/logout', [App\Http\Controllers\AuthController::class, 'handleLogout'])->name('auth.handle-logout');
     // GLOBAL MENU AUTHENTIKASI
     Route::get('/dashboard', [App\Http\Controllers\Private\User\RootController::class, 'renderDashboard'])->name('dashboard-index');
+    Route::get('/dashboard/infra', [App\Http\Controllers\RootController::class, 'indexInfra'])->name('dashboard.dashboard-infra');
+    Route::get('/dashboard/referensi', [App\Http\Controllers\RootController::class, 'indexReferensi'])->name('dashboard.dashboard-referensi');
+
+    // Profile
     Route::get('/profile', [App\Http\Controllers\Private\User\RootController::class, 'renderProfile'])->name('profile-index');
     Route::post('/profile', [App\Http\Controllers\Private\User\RootController::class, 'handleProfile'])->name('profile-update');
     Route::delete('/profile/pendidikan/{id}', [App\Http\Controllers\Private\User\RootController::class, 'deletePendidikan'])->name('profile.delete-pendidikan');
@@ -21,7 +25,6 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/pengaturan', [App\Http\Controllers\PengaturanController::class, 'update'])->name('pengaturan-update');
     
     // Master Data Referensi
-    Route::get('/referensi', [App\Http\Controllers\RootController::class, 'indexReferensi'])->name('referensi-index');
     Route::get('/referensi/agama', [App\Http\Controllers\Referensi\AgamaController::class, 'index'])->name('referensi.agama-index');
     Route::get('/referensi/agama/trashed', [App\Http\Controllers\Referensi\AgamaController::class, 'trash'])->name('referensi.agama-trash');
     Route::post('/referensi/agama', [App\Http\Controllers\Referensi\AgamaController::class, 'store'])->name('referensi.agama-store');
@@ -114,77 +117,79 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/infra/ruangan/{id}/delete', [App\Http\Controllers\Master\Infra\RuanganController::class, 'destroy'])->name('infra.ruangan-destroy');
     Route::post('/infra/ruangan/{id}/restore', [App\Http\Controllers\Master\Infra\RuanganController::class, 'restore'])->name('infra.ruangan-restore');
     
+
+    
     // Inventaris Routes
-    Route::get('/inventaris/kategori-barang', [App\Http\Controllers\Master\Inventaris\KategoriBarangController::class, 'index'])->name('inventaris.kategori-barang-index');
-    Route::get('/inventaris/kategori-barang/trashed', [App\Http\Controllers\Master\Inventaris\KategoriBarangController::class, 'trash'])->name('inventaris.kategori-barang-trash');
-    Route::post('/inventaris/kategori-barang', [App\Http\Controllers\Master\Inventaris\KategoriBarangController::class, 'store'])->name('inventaris.kategori-barang-store');
-    Route::patch('/inventaris/kategori-barang/{id}/update', [App\Http\Controllers\Master\Inventaris\KategoriBarangController::class, 'update'])->name('inventaris.kategori-barang-update');
-    Route::delete('/inventaris/kategori-barang/{id}/delete', [App\Http\Controllers\Master\Inventaris\KategoriBarangController::class, 'destroy'])->name('inventaris.kategori-barang-destroy');
-    Route::post('/inventaris/kategori-barang/{id}/restore', [App\Http\Controllers\Master\Inventaris\KategoriBarangController::class, 'restore'])->name('inventaris.kategori-barang-restore');
+    Route::get('/inventaris/kategori-barang', [App\Http\Controllers\Master\Infra\Inventaris\KategoriBarangController::class, 'index'])->name('inventaris.kategori-barang-index');
+    Route::get('/inventaris/kategori-barang/trashed', [App\Http\Controllers\Master\Infra\Inventaris\KategoriBarangController::class, 'trash'])->name('inventaris.kategori-barang-trash');
+    Route::post('/inventaris/kategori-barang', [App\Http\Controllers\Master\Infra\Inventaris\KategoriBarangController::class, 'store'])->name('inventaris.kategori-barang-store');
+    Route::patch('/inventaris/kategori-barang/{id}/update', [App\Http\Controllers\Master\Infra\Inventaris\KategoriBarangController::class, 'update'])->name('inventaris.kategori-barang-update');
+    Route::delete('/inventaris/kategori-barang/{id}/delete', [App\Http\Controllers\Master\Infra\Inventaris\KategoriBarangController::class, 'destroy'])->name('inventaris.kategori-barang-destroy');
+    Route::post('/inventaris/kategori-barang/{id}/restore', [App\Http\Controllers\Master\Infra\Inventaris\KategoriBarangController::class, 'restore'])->name('inventaris.kategori-barang-restore');
     
-    Route::get('/inventaris/barang', [App\Http\Controllers\Master\Inventaris\BarangController::class, 'index'])->name('inventaris.barang-index');
-    Route::get('/inventaris/barang/trashed', [App\Http\Controllers\Master\Inventaris\BarangController::class, 'trash'])->name('inventaris.barang-trash');
-    Route::post('/inventaris/barang', [App\Http\Controllers\Master\Inventaris\BarangController::class, 'store'])->name('inventaris.barang-store');
-    Route::patch('/inventaris/barang/{id}/update', [App\Http\Controllers\Master\Inventaris\BarangController::class, 'update'])->name('inventaris.barang-update');
-    Route::delete('/inventaris/barang/{id}/delete', [App\Http\Controllers\Master\Inventaris\BarangController::class, 'destroy'])->name('inventaris.barang-destroy');
-    Route::post('/inventaris/barang/{id}/restore', [App\Http\Controllers\Master\Inventaris\BarangController::class, 'restore'])->name('inventaris.barang-restore');
+    Route::get('/inventaris/barang', [App\Http\Controllers\Master\Infra\Inventaris\BarangController::class, 'index'])->name('inventaris.barang-index');
+    Route::get('/inventaris/barang/trashed', [App\Http\Controllers\Master\Infra\Inventaris\BarangController::class, 'trash'])->name('inventaris.barang-trash');
+    Route::post('/inventaris/barang', [App\Http\Controllers\Master\Infra\Inventaris\BarangController::class, 'store'])->name('inventaris.barang-store');
+    Route::patch('/inventaris/barang/{id}/update', [App\Http\Controllers\Master\Infra\Inventaris\BarangController::class, 'update'])->name('inventaris.barang-update');
+    Route::delete('/inventaris/barang/{id}/delete', [App\Http\Controllers\Master\Infra\Inventaris\BarangController::class, 'destroy'])->name('inventaris.barang-destroy');
+    Route::post('/inventaris/barang/{id}/restore', [App\Http\Controllers\Master\Infra\Inventaris\BarangController::class, 'restore'])->name('inventaris.barang-restore');
     
-    Route::get('/inventaris/barang-inventaris', [App\Http\Controllers\Master\Inventaris\BarangInventarisController::class, 'index'])->name('inventaris.barang-inventaris-index');
-    Route::get('/inventaris/barang-inventaris/trashed', [App\Http\Controllers\Master\Inventaris\BarangInventarisController::class, 'trash'])->name('inventaris.barang-inventaris-trash');
-    Route::post('/inventaris/barang-inventaris', [App\Http\Controllers\Master\Inventaris\BarangInventarisController::class, 'store'])->name('inventaris.barang-inventaris-store');
-    Route::patch('/inventaris/barang-inventaris/{id}/update', [App\Http\Controllers\Master\Inventaris\BarangInventarisController::class, 'update'])->name('inventaris.barang-inventaris-update');
-    Route::delete('/inventaris/barang-inventaris/{id}/delete', [App\Http\Controllers\Master\Inventaris\BarangInventarisController::class, 'destroy'])->name('inventaris.barang-inventaris-destroy');
-    Route::post('/inventaris/barang-inventaris/{id}/restore', [App\Http\Controllers\Master\Inventaris\BarangInventarisController::class, 'restore'])->name('inventaris.barang-inventaris-restore');
+    Route::get('/inventaris/barang-inventaris', [App\Http\Controllers\Master\Infra\Inventaris\BarangInventarisController::class, 'index'])->name('inventaris.barang-inventaris-index');
+    Route::get('/inventaris/barang-inventaris/trashed', [App\Http\Controllers\Master\Infra\Inventaris\BarangInventarisController::class, 'trash'])->name('inventaris.barang-inventaris-trash');
+    Route::post('/inventaris/barang-inventaris', [App\Http\Controllers\Master\Infra\Inventaris\BarangInventarisController::class, 'store'])->name('inventaris.barang-inventaris-store');
+    Route::patch('/inventaris/barang-inventaris/{id}/update', [App\Http\Controllers\Master\Infra\Inventaris\BarangInventarisController::class, 'update'])->name('inventaris.barang-inventaris-update');
+    Route::delete('/inventaris/barang-inventaris/{id}/delete', [App\Http\Controllers\Master\Infra\Inventaris\BarangInventarisController::class, 'destroy'])->name('inventaris.barang-inventaris-destroy');
+    Route::post('/inventaris/barang-inventaris/{id}/restore', [App\Http\Controllers\Master\Infra\Inventaris\BarangInventarisController::class, 'restore'])->name('inventaris.barang-inventaris-restore');
     
     // Transaksi Barang Routes
     // Peminjaman Barang
-    Route::get('/transaksi-barang/peminjaman', [App\Http\Controllers\Master\Transaksi\PeminjamanBarangController::class, 'index'])->name('transaksi-barang.peminjaman-index');
-    Route::get('/transaksi-barang/peminjaman/trashed', [App\Http\Controllers\Master\Transaksi\PeminjamanBarangController::class, 'trash'])->name('transaksi-barang.peminjaman-trash');
-    Route::post('/transaksi-barang/peminjaman', [App\Http\Controllers\Master\Transaksi\PeminjamanBarangController::class, 'store'])->name('transaksi-barang.peminjaman-store');
-    Route::patch('/transaksi-barang/peminjaman/{id}/update', [App\Http\Controllers\Master\Transaksi\PeminjamanBarangController::class, 'update'])->name('transaksi-barang.peminjaman-update');
-    Route::delete('/transaksi-barang/peminjaman/{id}/delete', [App\Http\Controllers\Master\Transaksi\PeminjamanBarangController::class, 'destroy'])->name('transaksi-barang.peminjaman-destroy');
-    Route::post('/transaksi-barang/peminjaman/{id}/restore', [App\Http\Controllers\Master\Transaksi\PeminjamanBarangController::class, 'restore'])->name('transaksi-barang.peminjaman-restore');
+    Route::get('/transaksi-barang/peminjaman', [App\Http\Controllers\Master\Infra\Transaksi\PeminjamanBarangController::class, 'index'])->name('transaksi-barang.peminjaman-index');
+    Route::get('/transaksi-barang/peminjaman/trashed', [App\Http\Controllers\Master\Infra\Transaksi\PeminjamanBarangController::class, 'trash'])->name('transaksi-barang.peminjaman-trash');
+    Route::post('/transaksi-barang/peminjaman', [App\Http\Controllers\Master\Infra\Transaksi\PeminjamanBarangController::class, 'store'])->name('transaksi-barang.peminjaman-store');
+    Route::patch('/transaksi-barang/peminjaman/{id}/update', [App\Http\Controllers\Master\Infra\Transaksi\PeminjamanBarangController::class, 'update'])->name('transaksi-barang.peminjaman-update');
+    Route::delete('/transaksi-barang/peminjaman/{id}/delete', [App\Http\Controllers\Master\Infra\Transaksi\PeminjamanBarangController::class, 'destroy'])->name('transaksi-barang.peminjaman-destroy');
+    Route::post('/transaksi-barang/peminjaman/{id}/restore', [App\Http\Controllers\Master\Infra\Transaksi\PeminjamanBarangController::class, 'restore'])->name('transaksi-barang.peminjaman-restore');
 
     // Pengecekan Barang
-    Route::get('/transaksi-barang/pengecekan', [App\Http\Controllers\Master\Transaksi\PengecekanBarangController::class, 'index'])->name('transaksi-barang.pengecekan-index');
-    Route::get('/transaksi-barang/pengecekan/trashed', [App\Http\Controllers\Master\Transaksi\PengecekanBarangController::class, 'trash'])->name('transaksi-barang.pengecekan-trash');
-    Route::post('/transaksi-barang/pengecekan', [App\Http\Controllers\Master\Transaksi\PengecekanBarangController::class, 'store'])->name('transaksi-barang.pengecekan-store');
-    Route::patch('/transaksi-barang/pengecekan/{id}/update', [App\Http\Controllers\Master\Transaksi\PengecekanBarangController::class, 'update'])->name('transaksi-barang.pengecekan-update');
-    Route::delete('/transaksi-barang/pengecekan/{id}/delete', [App\Http\Controllers\Master\Transaksi\PengecekanBarangController::class, 'destroy'])->name('transaksi-barang.pengecekan-destroy');
-    Route::post('/transaksi-barang/pengecekan/{id}/restore', [App\Http\Controllers\Master\Transaksi\PengecekanBarangController::class, 'restore'])->name('transaksi-barang.pengecekan-restore');
+    Route::get('/transaksi-barang/pengecekan', [App\Http\Controllers\Master\Infra\Transaksi\PengecekanBarangController::class, 'index'])->name('transaksi-barang.pengecekan-index');
+    Route::get('/transaksi-barang/pengecekan/trashed', [App\Http\Controllers\Master\Infra\Transaksi\PengecekanBarangController::class, 'trash'])->name('transaksi-barang.pengecekan-trash');
+    Route::post('/transaksi-barang/pengecekan', [App\Http\Controllers\Master\Infra\Transaksi\PengecekanBarangController::class, 'store'])->name('transaksi-barang.pengecekan-store');
+    Route::patch('/transaksi-barang/pengecekan/{id}/update', [App\Http\Controllers\Master\Infra\Transaksi\PengecekanBarangController::class, 'update'])->name('transaksi-barang.pengecekan-update');
+    Route::delete('/transaksi-barang/pengecekan/{id}/delete', [App\Http\Controllers\Master\Infra\Transaksi\PengecekanBarangController::class, 'destroy'])->name('transaksi-barang.pengecekan-destroy');
+    Route::post('/transaksi-barang/pengecekan/{id}/restore', [App\Http\Controllers\Master\Infra\Transaksi\PengecekanBarangController::class, 'restore'])->name('transaksi-barang.pengecekan-restore');
 
     // Pengajuan Perbaikan
-    Route::get('/transaksi-barang/pengajuan', [App\Http\Controllers\Master\Transaksi\PengajuanPerbaikanController::class, 'index'])->name('transaksi-barang.pengajuan-index');
-    Route::get('/transaksi-barang/pengajuan/trashed', [App\Http\Controllers\Master\Transaksi\PengajuanPerbaikanController::class, 'trash'])->name('transaksi-barang.pengajuan-trash');
-    Route::post('/transaksi-barang/pengajuan', [App\Http\Controllers\Master\Transaksi\PengajuanPerbaikanController::class, 'store'])->name('transaksi-barang.pengajuan-store');
-    Route::patch('/transaksi-barang/pengajuan/{id}/update', [App\Http\Controllers\Master\Transaksi\PengajuanPerbaikanController::class, 'update'])->name('transaksi-barang.pengajuan-update');
-    Route::delete('/transaksi-barang/pengajuan/{id}/delete', [App\Http\Controllers\Master\Transaksi\PengajuanPerbaikanController::class, 'destroy'])->name('transaksi-barang.pengajuan-destroy');
-    Route::post('/transaksi-barang/pengajuan/{id}/restore', [App\Http\Controllers\Master\Transaksi\PengajuanPerbaikanController::class, 'restore'])->name('transaksi-barang.pengajuan-restore');
+    Route::get('/transaksi-barang/pengajuan', [App\Http\Controllers\Master\Infra\Transaksi\PengajuanPerbaikanController::class, 'index'])->name('transaksi-barang.pengajuan-index');
+    Route::get('/transaksi-barang/pengajuan/trashed', [App\Http\Controllers\Master\Infra\Transaksi\PengajuanPerbaikanController::class, 'trash'])->name('transaksi-barang.pengajuan-trash');
+    Route::post('/transaksi-barang/pengajuan', [App\Http\Controllers\Master\Infra\Transaksi\PengajuanPerbaikanController::class, 'store'])->name('transaksi-barang.pengajuan-store');
+    Route::patch('/transaksi-barang/pengajuan/{id}/update', [App\Http\Controllers\Master\Infra\Transaksi\PengajuanPerbaikanController::class, 'update'])->name('transaksi-barang.pengajuan-update');
+    Route::delete('/transaksi-barang/pengajuan/{id}/delete', [App\Http\Controllers\Master\Infra\Transaksi\PengajuanPerbaikanController::class, 'destroy'])->name('transaksi-barang.pengajuan-destroy');
+    Route::post('/transaksi-barang/pengajuan/{id}/restore', [App\Http\Controllers\Master\Infra\Transaksi\PengajuanPerbaikanController::class, 'restore'])->name('transaksi-barang.pengajuan-restore');
 
     // Riwayat Perbaikan
-    Route::get('/transaksi-barang/riwayat', [App\Http\Controllers\Master\Transaksi\RiwayatPerbaikanController::class, 'index'])->name('transaksi-barang.riwayat-index');
-    Route::get('/transaksi-barang/riwayat/trashed', [App\Http\Controllers\Master\Transaksi\RiwayatPerbaikanController::class, 'trash'])->name('transaksi-barang.riwayat-trash');
-    Route::post('/transaksi-barang/riwayat', [App\Http\Controllers\Master\Transaksi\RiwayatPerbaikanController::class, 'store'])->name('transaksi-barang.riwayat-store');
-    Route::patch('/transaksi-barang/riwayat/{id}/update', [App\Http\Controllers\Master\Transaksi\RiwayatPerbaikanController::class, 'update'])->name('transaksi-barang.riwayat-update');
-    Route::delete('/transaksi-barang/riwayat/{id}/delete', [App\Http\Controllers\Master\Transaksi\RiwayatPerbaikanController::class, 'destroy'])->name('transaksi-barang.riwayat-destroy');
-    Route::post('/transaksi-barang/riwayat/{id}/restore', [App\Http\Controllers\Master\Transaksi\RiwayatPerbaikanController::class, 'restore'])->name('transaksi-barang.riwayat-restore');
+    Route::get('/transaksi-barang/riwayat', [App\Http\Controllers\Master\Infra\Transaksi\RiwayatPerbaikanController::class, 'index'])->name('transaksi-barang.riwayat-index');
+    Route::get('/transaksi-barang/riwayat/trashed', [App\Http\Controllers\Master\Infra\Transaksi\RiwayatPerbaikanController::class, 'trash'])->name('transaksi-barang.riwayat-trash');
+    Route::post('/transaksi-barang/riwayat', [App\Http\Controllers\Master\Infra\Transaksi\RiwayatPerbaikanController::class, 'store'])->name('transaksi-barang.riwayat-store');
+    Route::patch('/transaksi-barang/riwayat/{id}/update', [App\Http\Controllers\Master\Infra\Transaksi\RiwayatPerbaikanController::class, 'update'])->name('transaksi-barang.riwayat-update');
+    Route::delete('/transaksi-barang/riwayat/{id}/delete', [App\Http\Controllers\Master\Infra\Transaksi\RiwayatPerbaikanController::class, 'destroy'])->name('transaksi-barang.riwayat-destroy');
+    Route::post('/transaksi-barang/riwayat/{id}/restore', [App\Http\Controllers\Master\Infra\Transaksi\RiwayatPerbaikanController::class, 'restore'])->name('transaksi-barang.riwayat-restore');
 
     // Perawatan Barang Routes
     // Jadwal Pemeliharaan
-    Route::get('/perawatan/jadwal', [App\Http\Controllers\Master\Perawatan\JadwalPemeliharaanController::class, 'index'])->name('perawatan.jadwal-index');
-    Route::get('/perawatan/jadwal/trashed', [App\Http\Controllers\Master\Perawatan\JadwalPemeliharaanController::class, 'trash'])->name('perawatan.jadwal-trash');
-    Route::post('/perawatan/jadwal', [App\Http\Controllers\Master\Perawatan\JadwalPemeliharaanController::class, 'store'])->name('perawatan.jadwal-store');
-    Route::patch('/perawatan/jadwal/{id}/update', [App\Http\Controllers\Master\Perawatan\JadwalPemeliharaanController::class, 'update'])->name('perawatan.jadwal-update');
-    Route::delete('/perawatan/jadwal/{id}/delete', [App\Http\Controllers\Master\Perawatan\JadwalPemeliharaanController::class, 'destroy'])->name('perawatan.jadwal-destroy');
-    Route::post('/perawatan/jadwal/{id}/restore', [App\Http\Controllers\Master\Perawatan\JadwalPemeliharaanController::class, 'restore'])->name('perawatan.jadwal-restore');
+    Route::get('/perawatan/jadwal', [App\Http\Controllers\Master\Infra\Perawatan\JadwalPemeliharaanController::class, 'index'])->name('perawatan.jadwal-index');
+    Route::get('/perawatan/jadwal/trashed', [App\Http\Controllers\Master\Infra\Perawatan\JadwalPemeliharaanController::class, 'trash'])->name('perawatan.jadwal-trash');
+    Route::post('/perawatan/jadwal', [App\Http\Controllers\Master\Infra\Perawatan\JadwalPemeliharaanController::class, 'store'])->name('perawatan.jadwal-store');
+    Route::patch('/perawatan/jadwal/{id}/update', [App\Http\Controllers\Master\Infra\Perawatan\JadwalPemeliharaanController::class, 'update'])->name('perawatan.jadwal-update');
+    Route::delete('/perawatan/jadwal/{id}/delete', [App\Http\Controllers\Master\Infra\Perawatan\JadwalPemeliharaanController::class, 'destroy'])->name('perawatan.jadwal-destroy');
+    Route::post('/perawatan/jadwal/{id}/restore', [App\Http\Controllers\Master\Infra\Perawatan\JadwalPemeliharaanController::class, 'restore'])->name('perawatan.jadwal-restore');
 
     // Histori Pemeliharaan
-    Route::get('/perawatan/histori', [App\Http\Controllers\Master\Perawatan\HistoriPemeliharaanController::class, 'index'])->name('perawatan.histori-index');
-    Route::get('/perawatan/histori/trashed', [App\Http\Controllers\Master\Perawatan\HistoriPemeliharaanController::class, 'trash'])->name('perawatan.histori-trash');
-    Route::post('/perawatan/histori', [App\Http\Controllers\Master\Perawatan\HistoriPemeliharaanController::class, 'store'])->name('perawatan.histori-store');
-    Route::patch('/perawatan/histori/{id}/update', [App\Http\Controllers\Master\Perawatan\HistoriPemeliharaanController::class, 'update'])->name('perawatan.histori-update');
-    Route::delete('/perawatan/histori/{id}/delete', [App\Http\Controllers\Master\Perawatan\HistoriPemeliharaanController::class, 'destroy'])->name('perawatan.histori-destroy');
-    Route::post('/perawatan/histori/{id}/restore', [App\Http\Controllers\Master\Perawatan\HistoriPemeliharaanController::class, 'restore'])->name('perawatan.histori-restore');
+    Route::get('/perawatan/histori', [App\Http\Controllers\Master\Infra\Perawatan\HistoriPemeliharaanController::class, 'index'])->name('perawatan.histori-index');
+    Route::get('/perawatan/histori/trashed', [App\Http\Controllers\Master\Infra\Perawatan\HistoriPemeliharaanController::class, 'trash'])->name('perawatan.histori-trash');
+    Route::post('/perawatan/histori', [App\Http\Controllers\Master\Infra\Perawatan\HistoriPemeliharaanController::class, 'store'])->name('perawatan.histori-store');
+    Route::patch('/perawatan/histori/{id}/update', [App\Http\Controllers\Master\Infra\Perawatan\HistoriPemeliharaanController::class, 'update'])->name('perawatan.histori-update');
+    Route::delete('/perawatan/histori/{id}/delete', [App\Http\Controllers\Master\Infra\Perawatan\HistoriPemeliharaanController::class, 'destroy'])->name('perawatan.histori-destroy');
+    Route::post('/perawatan/histori/{id}/restore', [App\Http\Controllers\Master\Infra\Perawatan\HistoriPemeliharaanController::class, 'restore'])->name('perawatan.histori-restore');
 
 });
 

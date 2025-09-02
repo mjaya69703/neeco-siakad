@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Master\Inventaris;
+namespace App\Http\Controllers\Master\Infra\Inventaris;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -26,7 +26,7 @@ class BarangController extends Controller
         $data['kategori_barangs'] = KategoriBarang::orderBy('name')->get();
         $data['is_trash'] = false;
 
-        return view('master.inventaris.barang-index', $data, compact('user'));
+        return view('master.infra.inventaris.barang-index', $data, compact('user'));
     }
 
     public function trash()
@@ -41,7 +41,7 @@ class BarangController extends Controller
         $data['kategori_barangs'] = KategoriBarang::orderBy('name')->get();
         $data['is_trash'] = true;
 
-        return view('master.inventaris.barang-index', $data, compact('user'));
+        return view('master.infra.inventaris.barang-index', $data, compact('user'));
     }
 
     public function store(Request $request)

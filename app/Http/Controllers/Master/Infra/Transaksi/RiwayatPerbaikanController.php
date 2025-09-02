@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Master\Transaksi;
+namespace App\Http\Controllers\Master\Infra\Inventaris;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -30,7 +30,7 @@ class RiwayatPerbaikanController extends Controller
         $data['barang_inventaris'] = BarangInventaris::with('barang')->where('is_active', true)->orderBy('nomor_inventaris')->get();
         $data['is_trash'] = false;
 
-        return view('master.transaksi-barang.riwayat-index', $data, compact('user'));
+        return view('master.infra.transaksi-barang.riwayat-index', $data, compact('user'));
     }
 
     public function trash()
@@ -46,7 +46,7 @@ class RiwayatPerbaikanController extends Controller
         $data['barang_inventaris'] = BarangInventaris::with('barang')->where('is_active', true)->orderBy('nomor_inventaris')->get();
         $data['is_trash'] = true;
 
-        return view('master.transaksi-barang.riwayat-index', $data, compact('user'));
+        return view('master.infra.transaksi-barang.riwayat-index', $data, compact('user'));
     }
 
     public function store(Request $request)

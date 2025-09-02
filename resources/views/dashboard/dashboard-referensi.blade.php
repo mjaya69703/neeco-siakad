@@ -246,7 +246,7 @@
             </div>
             <div class="col-auto ms-auto d-print-none">
                 <div class="btn-list">
-                    <a href="{{ route('referensi-index') }}" class="btn btn-primary management-btn">
+                    <a href="{{ route('dashboard.dashboard-referensi') }}" class="btn btn-primary management-btn">
                         <i class="fas fa-cog me-1"></i>
                         Kelola Data Referensi
                     </a>

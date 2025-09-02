@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Master\Transaksi;
+namespace App\Http\Controllers\Master\Infra\Inventaris;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -29,7 +29,7 @@ class PeminjamanBarangController extends Controller
         $data['users'] = User::orderBy('name')->get();
         $data['is_trash'] = false;
 
-        return view('master.transaksi-barang.peminjaman-index', $data, compact('user'));
+        return view('master.infra.transaksi-barang.peminjaman-index', $data, compact('user'));
     }
 
     public function trash()
@@ -45,7 +45,7 @@ class PeminjamanBarangController extends Controller
         $data['users'] = User::orderBy('name')->get();
         $data['is_trash'] = true;
 
-        return view('master.transaksi-barang.peminjaman-index', $data, compact('user'));
+        return view('master.infra.transaksi-barang.peminjaman-index', $data, compact('user'));
     }
 
     public function store(Request $request)
