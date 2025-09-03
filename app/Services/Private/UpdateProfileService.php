@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Storage;
 // Use Plugin
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
+// Use Models
+use App\Models\Referensi\Alamat;
 
 class UpdateProfileService
 {
@@ -20,12 +22,31 @@ class UpdateProfileService
         try {
 
             DB::beginTransaction();
-            $this->updateBasicInfo($user, $data);
-            $this->updatePhoto($user, $data);
-            $this->updatePassword($user, $data);
-            $this->syncEducation($user, $data);
-            $this->syncKeluarga($user, $data);
-            $this->syncAlamat($user, $data);
+            
+            // Only run updates when relevant data is present
+            if ($this->hasBasicInfoData($data)) {
+                $this->updateBasicInfo($user, $data);
+            }
+            
+            if (isset($data['photo']) && $data['photo']->isValid()) {
+                $this->updatePhoto($user, $data);
+            }
+            
+            if ($this->hasAddressData($data)) {
+                $this->updateAddresses($user, $data);
+            }
+            
+            if ($this->hasEducationData($data)) {
+                $this->updateEducations($user, $data);
+            }
+            
+            if ($this->hasFamilyData($data)) {
+                $this->updateFamilies($user, $data);
+            }
+            
+            if (!empty($data['current_password']) && !empty($data['new_password'])) {
+                $this->updatePassword($user, $data);
+            }
 
             DB::commit();
             
@@ -36,7 +57,41 @@ class UpdateProfileService
                 'file' => $th->getFile(),
                 'line' => $th->getLine()
             ]);
+            throw $th;
         }
+    }
+
+    private function hasBasicInfoData(array $data): bool
+    {
+        $basicInfoFields = [
+            'name', 'username', 'email', 'phone', 'agama_id', 'golongan_darah_id',
+            'jenis_kelamin_id', 'kewarganegaraan_id', 'tinggi_badan', 'berat_badan',
+            'tempat_lahir', 'tanggal_lahir', 'link_ig', 'link_fb', 'link_in',
+            'nomor_kk', 'nomor_ktp', 'nomor_npwp', 'fst_setup', 'tfa_setup'
+        ];
+        
+        foreach ($basicInfoFields as $field) {
+            if (isset($data[$field])) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+
+    private function hasAddressData(array $data): bool
+    {
+        return isset($data['alamat_ktp']) || isset($data['alamat_domisili']);
+    }
+
+    private function hasEducationData(array $data): bool
+    {
+        return isset($data['pendidikan']) || isset($data['deleted_pendidikan']);
+    }
+
+    private function hasFamilyData(array $data): bool
+    {
+        return isset($data['keluarga']) || isset($data['deleted_keluarga']);
     }
 
     private function updateBasicInfo($user,array $in){
@@ -101,6 +156,179 @@ class UpdateProfileService
         $user->update(['photo' => $fileName]);
     }
 
+    private function updateAddresses($user, array $in)
+    {
+        // Update or create KTP address
+        if (isset($in['alamat_ktp'])) {
+            $ktpData = $in['alamat_ktp'];
+            
+            // Remove empty values
+            $ktpData = array_filter($ktpData, function($value) {
+                return $value !== null && $value !== '';
+            });
+            
+            // Only proceed if we have data to save
+            if (!empty($ktpData)) {
+                // Check if user already has a KTP address
+                $existingKtp = $user->alamatKtp()->first();
+                
+                // Make sure we have the required fields for owner relationship
+                $ktpData['owner_type'] = get_class($user);
+                $ktpData['owner_id'] = $user->id;
+                $ktpData['tipe'] = 'ktp';
+                
+                if ($existingKtp) {
+                    // Update existing KTP address
+                    $existingKtp->update($ktpData);
+                } else {
+                    // Create new KTP address using the relationship
+                    $ktpData['created_by'] = $user->id;
+                    $user->alamats()->create($ktpData);
+                }
+            }
+        }
+
+        // Update or create Domisili address
+        if (isset($in['alamat_domisili'])) {
+            $domisiliData = $in['alamat_domisili'];
+            
+            // Remove empty values
+            $domisiliData = array_filter($domisiliData, function($value) {
+                return $value !== null && $value !== '';
+            });
+            
+            // Only proceed if we have data to save
+            if (!empty($domisiliData)) {
+                // Check if user already has a Domisili address
+                $existingDomisili = $user->alamatDomisili()->first();
+                
+                // Make sure we have the required fields for owner relationship
+                $domisiliData['owner_type'] = get_class($user);
+                $domisiliData['owner_id'] = $user->id;
+                $domisiliData['tipe'] = 'domisili';
+                
+                if ($existingDomisili) {
+                    // Update existing Domisili address
+                    $existingDomisili->update($domisiliData);
+                } else {
+                    // Create new Domisili address using the relationship
+                    $domisiliData['created_by'] = $user->id;
+                    $user->alamats()->create($domisiliData);
+                }
+            }
+        }
+    }
+
+    private function updateEducations($user, array $in)
+    {
+        // Handle education records (allow multiple)
+        if (isset($in['pendidikan']) && is_array($in['pendidikan'])) {
+            $existingIds = [];
+            
+            foreach ($in['pendidikan'] as $pendidikanData) {
+                // Remove empty values
+                $pendidikanData = array_filter($pendidikanData, function($value) {
+                    return $value !== null && $value !== '';
+                });
+                
+                // Skip if no data
+                if (empty($pendidikanData)) {
+                    continue;
+                }
+                
+                // Make sure we have the required fields for owner relationship
+                $pendidikanData['owner_type'] = get_class($user);
+                $pendidikanData['owner_id'] = $user->id;
+                
+                if (!empty($pendidikanData['id'])) {
+                    // Update existing education record
+                    $pendidikan = $user->pendidikans()->find($pendidikanData['id']);
+                    if ($pendidikan) {
+                        $pendidikan->update($pendidikanData);
+                        $existingIds[] = $pendidikanData['id'];
+                    }
+                } else {
+                    // Create new education record
+                    $pendidikanData['created_by'] = $user->id;
+                    $newPendidikan = $user->pendidikans()->create($pendidikanData);
+                    $existingIds[] = $newPendidikan->id;
+                }
+            }
+            
+            // Delete education records that are no longer in the input
+            $user->pendidikans()->whereNotIn('id', $existingIds)->delete();
+        } else {
+            // If no education data is provided, delete all existing records
+            $user->pendidikans()->delete();
+        }
+        
+        // Handle deleted education records (from the hidden input field)
+        if (!empty($in['deleted_pendidikan'])) {
+            $deletedIds = explode(',', $in['deleted_pendidikan']);
+            foreach ($deletedIds as $id) {
+                $pendidikan = $user->pendidikans()->find($id);
+                if ($pendidikan) {
+                    $pendidikan->delete();
+                }
+            }
+        }
+    }
+
+    private function updateFamilies($user, array $in)
+    {
+        // Handle family records (allow multiple)
+        if (isset($in['keluarga']) && is_array($in['keluarga'])) {
+            $existingIds = [];
+            
+            foreach ($in['keluarga'] as $keluargaData) {
+                // Remove empty values
+                $keluargaData = array_filter($keluargaData, function($value) {
+                    return $value !== null && $value !== '';
+                });
+                
+                // Skip if no data
+                if (empty($keluargaData)) {
+                    continue;
+                }
+                
+                // Make sure we have the required fields for owner relationship
+                $keluargaData['owner_type'] = get_class($user);
+                $keluargaData['owner_id'] = $user->id;
+                
+                if (!empty($keluargaData['id'])) {
+                    // Update existing family record
+                    $keluarga = $user->keluargas()->find($keluargaData['id']);
+                    if ($keluarga) {
+                        $keluarga->update($keluargaData);
+                        $existingIds[] = $keluargaData['id'];
+                    }
+                } else {
+                    // Create new family record
+                    $keluargaData['created_by'] = $user->id;
+                    $newKeluarga = $user->keluargas()->create($keluargaData);
+                    $existingIds[] = $newKeluarga->id;
+                }
+            }
+            
+            // Delete family records that are no longer in the input
+            $user->keluargas()->whereNotIn('id', $existingIds)->delete();
+        } else {
+            // If no family data is provided, delete all existing records
+            $user->keluargas()->delete();
+        }
+        
+        // Handle deleted family records (from the hidden input field)
+        if (!empty($in['deleted_keluarga'])) {
+            $deletedIds = explode(',', $in['deleted_keluarga']);
+            foreach ($deletedIds as $id) {
+                $keluarga = $user->keluargas()->find($id);
+                if ($keluarga) {
+                    $keluarga->delete();
+                }
+            }
+        }
+    }
+
     private function updatePassword($user, array $in)
     {
         // Kalau field password kosong, skip
@@ -120,133 +348,4 @@ class UpdateProfileService
         ]);
     }
 
-
-    private function syncEducation($user, array $in)
-    {
-        if (!isset($in['pendidikan']) || !is_array($in['pendidikan'])) {
-            return;
-        }
-
-        foreach ($in['pendidikan'] as $pendidikanData) {
-            // Skip if required fields are empty
-            if (empty($pendidikanData['jenjang']) || empty($pendidikanData['nama_institusi'])) {
-                continue;
-            }
-
-            $pendidikanData = array_filter($pendidikanData, fn($v) => $v !== null && $v !== '');
-            $pendidikanData['owner_id'] = $user->id;
-            $pendidikanData['owner_type'] = get_class($user);
-            $pendidikanData['updated_by'] = $user->id;
-
-            if (!empty($pendidikanData['id'])) {
-                // Update existing record
-                $existingPendidikan = $user->pendidikans()->find($pendidikanData['id']);
-                if ($existingPendidikan) {
-                    unset($pendidikanData['id']);
-                    $existingPendidikan->update($pendidikanData);
-                }
-            } else {
-                // Create new record
-                unset($pendidikanData['id']);
-                $pendidikanData['created_by'] = $user->id;
-                $user->pendidikans()->create($pendidikanData);
-            }
-        }
-    }
-
-    private function syncKeluarga($user, array $in)
-    {
-        if (!isset($in['keluarga']) || !is_array($in['keluarga'])) {
-            return;
-        }
-
-        foreach ($in['keluarga'] as $keluargaData) {
-            // Skip if required fields are empty
-            if (empty($keluargaData['hubungan']) || empty($keluargaData['nama'])) {
-                continue;
-            }
-
-            $keluargaData = array_filter($keluargaData, fn($v) => $v !== null && $v !== '');
-            $keluargaData['owner_id'] = $user->id;
-            $keluargaData['owner_type'] = get_class($user);
-            $keluargaData['updated_by'] = $user->id;
-
-            if (!empty($keluargaData['id'])) {
-                // Update existing record
-                $existingKeluarga = $user->keluargas()->find($keluargaData['id']);
-                if ($existingKeluarga) {
-                    unset($keluargaData['id']);
-                    $existingKeluarga->update($keluargaData);
-                }
-            } else {
-                // Create new record
-                unset($keluargaData['id']);
-                $keluargaData['created_by'] = $user->id;
-                $user->keluargas()->create($keluargaData);
-            }
-        }
-    }
-
-    private function syncAlamat($user, array $in)
-    {
-        // Sync Alamat KTP
-        if (isset($in['alamat_ktp']) && is_array($in['alamat_ktp'])) {
-            $alamatKtpData = $in['alamat_ktp'];
-            
-            // Only process if alamat_lengkap is provided
-            if (!empty($alamatKtpData['alamat_lengkap'])) {
-                
-
-                
-                $alamatKtpData = array_filter($alamatKtpData, fn($v) => $v !== null && $v !== '');
-                $alamatKtpData['owner_id'] = $user->id;
-                $alamatKtpData['owner_type'] = get_class($user);
-                $alamatKtpData['tipe'] = 'ktp';
-                $alamatKtpData['updated_by'] = $user->id;
-
-                if (!empty($alamatKtpData['id'])) {
-                    // Update existing KTP address
-                    $existingAlamatKtp = $user->alamats()->where('tipe', 'ktp')->find($alamatKtpData['id']);
-                    if ($existingAlamatKtp) {
-                        unset($alamatKtpData['id']);
-                        $existingAlamatKtp->update($alamatKtpData);
-                    }
-                } else {
-                    // Create new KTP address
-                    unset($alamatKtpData['id']);
-                    $alamatKtpData['created_by'] = $user->id;
-                    $user->alamats()->create($alamatKtpData);
-                }
-            }
-        }
-
-        // Sync Alamat Domisili
-        if (isset($in['alamat_domisili']) && is_array($in['alamat_domisili'])) {
-            $alamatDomisiliData = $in['alamat_domisili'];
-            
-            // Only process if alamat_lengkap is provided
-            if (!empty($alamatDomisiliData['alamat_lengkap'])) {
-                
-                $alamatDomisiliData = array_filter($alamatDomisiliData, fn($v) => $v !== null && $v !== '');
-                $alamatDomisiliData['owner_id'] = $user->id;
-                $alamatDomisiliData['owner_type'] = get_class($user);
-                $alamatDomisiliData['tipe'] = 'domisili';
-                $alamatDomisiliData['updated_by'] = $user->id;
-
-                if (!empty($alamatDomisiliData['id'])) {
-                    // Update existing domisili address
-                    $existingAlamatDomisili = $user->alamats()->where('tipe', 'domisili')->find($alamatDomisiliData['id']);
-                    if ($existingAlamatDomisili) {
-                        unset($alamatDomisiliData['id']);
-                        $existingAlamatDomisili->update($alamatDomisiliData);
-                    }
-                } else {
-                    // Create new domisili address
-                    unset($alamatDomisiliData['id']);
-                    $alamatDomisiliData['created_by'] = $user->id;
-                    $user->alamats()->create($alamatDomisiliData);
-                }
-            }
-        }
-    }
 }

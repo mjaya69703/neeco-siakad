@@ -247,47 +247,47 @@
                             <div class="form-section">
                                 <h5 class="mb-3">Alamat KTP</h5>
                                 <div class="row">
-                                    <input type="hidden" name="alamat_ktp[id]" value="{{ $user->alamatKtp->first()->id ?? '' }}">
+                                    <input type="hidden" name="alamat_ktp[id]" value="{{ $user->alamat_ktp->id ?? '' }}">
                                     <input type="hidden" name="alamat_ktp[tipe]" value="ktp">
                                     <div class="col-md-12 mb-3">
                                         <label class="form-label">Alamat Lengkap KTP</label>
                                         <textarea class="form-control" name="alamat_ktp[alamat_lengkap]" rows="3" 
-                                                  placeholder="Jl. Contoh No. 123, RT 01/RW 02">{{ $user->alamatKtp->first()->alamat_lengkap ?? '' }}</textarea>
+                                                  placeholder="Jl. Contoh No. 123, RT 01/RW 02">{{ $user->alamat_ktp->alamat_lengkap ?? '' }}</textarea>
                                     </div>
                                     <div class="col-md-2 mb-3">
                                         <label class="form-label">RT</label>
                                         <input type="text" class="form-control" name="alamat_ktp[rt]" 
-                                               value="{{ $user->alamatKtp->first()->rt ?? '' }}" placeholder="001">
+                                               value="{{ $user->alamat_ktp->rt ?? '' }}" placeholder="001">
                                     </div>
                                     <div class="col-md-2 mb-3">
                                         <label class="form-label">RW</label>
                                         <input type="text" class="form-control" name="alamat_ktp[rw]" 
-                                               value="{{ $user->alamatKtp->first()->rw ?? '' }}" placeholder="002">
+                                               value="{{ $user->alamat_ktp->rw ?? '' }}" placeholder="002">
                                     </div>
                                     <div class="col-md-4 mb-3">
                                         <label class="form-label">Kelurahan/Desa</label>
                                         <input type="text" class="form-control" name="alamat_ktp[kelurahan]" 
-                                               value="{{ $user->alamatKtp->first()->kelurahan ?? '' }}" placeholder="Nama kelurahan/desa">
+                                               value="{{ $user->alamat_ktp->kelurahan ?? '' }}" placeholder="Nama kelurahan/desa">
                                     </div>
                                     <div class="col-md-4 mb-3">
                                         <label class="form-label">Kecamatan</label>
                                         <input type="text" class="form-control" name="alamat_ktp[kecamatan]" 
-                                               value="{{ $user->alamatKtp->first()->kecamatan ?? '' }}" placeholder="Nama kecamatan">
+                                               value="{{ $user->alamat_ktp->kecamatan ?? '' }}" placeholder="Nama kecamatan">
                                     </div>
                                     <div class="col-md-4 mb-3">
                                         <label class="form-label">Kota/Kabupaten</label>
                                         <input type="text" class="form-control" name="alamat_ktp[kota_kabupaten]" 
-                                               value="{{ $user->alamatKtp->first()->kota_kabupaten ?? '' }}" placeholder="Nama kota/kabupaten">
+                                               value="{{ $user->alamat_ktp->kota_kabupaten ?? '' }}" placeholder="Nama kota/kabupaten">
                                     </div>
                                     <div class="col-md-4 mb-3">
                                         <label class="form-label">Provinsi</label>
                                         <input type="text" class="form-control" name="alamat_ktp[provinsi]" 
-                                               value="{{ $user->alamatKtp->first()->provinsi ?? '' }}" placeholder="Nama provinsi">
+                                               value="{{ $user->alamat_ktp->provinsi ?? '' }}" placeholder="Nama provinsi">
                                     </div>
                                     <div class="col-md-4 mb-3">
                                         <label class="form-label">Kode Pos</label>
                                         <input type="text" class="form-control" name="alamat_ktp[kode_pos]" 
-                                               value="{{ $user->alamatKtp->first()->kode_pos ?? '' }}" placeholder="12345" maxlength="10">
+                                               value="{{ $user->alamat_ktp->kode_pos ?? '' }}" placeholder="12345" maxlength="10">
                                     </div>
                                 </div>
                             </div>
@@ -303,47 +303,47 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <input type="hidden" name="alamat_domisili[id]" value="{{ $user->alamatDomisili->first()->id ?? '' }}">
+                                    <input type="hidden" name="alamat_domisili[id]" value="{{ $user->alamat_domisili->id ?? '' }}">
                                     <input type="hidden" name="alamat_domisili[tipe]" value="domisili">
                                     <div class="col-md-12 mb-3">
                                         <label class="form-label">Alamat Lengkap Domisili</label>
                                         <textarea class="form-control" name="alamat_domisili[alamat_lengkap]" rows="3" 
-                                                  placeholder="Jl. Contoh No. 123, RT 01/RW 02" id="domisili_alamat_lengkap">{{ $user->alamatDomisili->first()->alamat_lengkap ?? '' }}</textarea>
+                                                  placeholder="Jl. Contoh No. 123, RT 01/RW 02" id="domisili_alamat_lengkap">{{ $user->alamat_domisili->alamat_lengkap ?? '' }}</textarea>
                                     </div>
                                     <div class="col-md-2 mb-3">
                                         <label class="form-label">RT</label>
                                         <input type="text" class="form-control" name="alamat_domisili[rt]" 
-                                               value="{{ $user->alamatDomisili->first()->rt ?? '' }}" placeholder="001" id="domisili_rt">
+                                               value="{{ $user->alamat_domisili->rt ?? '' }}" placeholder="001" id="domisili_rt">
                                     </div>
                                     <div class="col-md-2 mb-3">
                                         <label class="form-label">RW</label>
                                         <input type="text" class="form-control" name="alamat_domisili[rw]" 
-                                               value="{{ $user->alamatDomisili->first()->rw ?? '' }}" placeholder="002" id="domisili_rw">
+                                               value="{{ $user->alamat_domisili->rw ?? '' }}" placeholder="002" id="domisili_rw">
                                     </div>
                                     <div class="col-md-4 mb-3">
                                         <label class="form-label">Kelurahan/Desa</label>
                                         <input type="text" class="form-control" name="alamat_domisili[kelurahan]" 
-                                               value="{{ $user->alamatDomisili->first()->kelurahan ?? '' }}" placeholder="Nama kelurahan/desa" id="domisili_kelurahan">
+                                               value="{{ $user->alamat_domisili->kelurahan ?? '' }}" placeholder="Nama kelurahan/desa" id="domisili_kelurahan">
                                     </div>
                                     <div class="col-md-4 mb-3">
                                         <label class="form-label">Kecamatan</label>
                                         <input type="text" class="form-control" name="alamat_domisili[kecamatan]" 
-                                               value="{{ $user->alamatDomisili->first()->kecamatan ?? '' }}" placeholder="Nama kecamatan" id="domisili_kecamatan">
+                                               value="{{ $user->alamat_domisili->kecamatan ?? '' }}" placeholder="Nama kecamatan" id="domisili_kecamatan">
                                     </div>
                                     <div class="col-md-4 mb-3">
                                         <label class="form-label">Kota/Kabupaten</label>
                                         <input type="text" class="form-control" name="alamat_domisili[kota_kabupaten]" 
-                                               value="{{ $user->alamatDomisili->first()->kota_kabupaten ?? '' }}" placeholder="Nama kota/kabupaten" id="domisili_kota_kabupaten">
+                                               value="{{ $user->alamat_domisili->kota_kabupaten ?? '' }}" placeholder="Nama kota/kabupaten" id="domisili_kota_kabupaten">
                                     </div>
                                     <div class="col-md-4 mb-3">
                                         <label class="form-label">Provinsi</label>
                                         <input type="text" class="form-control" name="alamat_domisili[provinsi]" 
-                                               value="{{ $user->alamatDomisili->first()->provinsi ?? '' }}" placeholder="Nama provinsi" id="domisili_provinsi">
+                                               value="{{ $user->alamat_domisili->provinsi ?? '' }}" placeholder="Nama provinsi" id="domisili_provinsi">
                                     </div>
                                     <div class="col-md-4 mb-3">
                                         <label class="form-label">Kode Pos</label>
                                         <input type="text" class="form-control" name="alamat_domisili[kode_pos]" 
-                                               value="{{ $user->alamatDomisili->first()->kode_pos ?? '' }}" placeholder="12345" maxlength="10" id="domisili_kode_pos">
+                                               value="{{ $user->alamat_domisili->kode_pos ?? '' }}" placeholder="12345" maxlength="10" id="domisili_kode_pos">
                                     </div>
                                 </div>
                             </div>
@@ -621,7 +621,6 @@ function addPendidikan() {
         <div class="card mb-3 pendidikan-item" data-index="${pendidikanIndex}">
             <div class="card-body">
                 <div class="row">
-                    <input type="hidden" name="pendidikan[${pendidikanIndex}][id]" value="">
                     <div class="col-md-3 mb-3">
                         <label class="form-label">Jenjang Pendidikan</label>
                         <select class="form-select" name="pendidikan[${pendidikanIndex}][jenjang]" required>
@@ -682,15 +681,12 @@ function addPendidikan() {
 // Keluarga Functions
 let keluargaIndex = {{ count($user->keluargas) }};
 
-
-
 function addKeluarga() {
     const container = document.getElementById('keluarga-container');
     const template = `
         <div class="card mb-3 keluarga-item" data-index="${keluargaIndex}">
             <div class="card-body">
                 <div class="row">
-                    <input type="hidden" name="keluarga[${keluargaIndex}][id]" value="">
                     <div class="col-md-3 mb-3">
                         <label class="form-label">Hubungan Keluarga</label>
                         <select class="form-select" name="keluarga[${keluargaIndex}][hubungan]" required>
@@ -823,6 +819,15 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             const button = e.target.closest('.delete-pendidikan');
             const index = button.getAttribute('data-index');
+            
+            // Add to deleted pendidikan list
+            const deletedInput = document.getElementById('deleted_pendidikan');
+            if (deletedInput.value) {
+                deletedInput.value += ',' + index;
+            } else {
+                deletedInput.value = index;
+            }
+            
             removePendidikan(index);
         }
         
@@ -831,6 +836,15 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             const button = e.target.closest('.delete-keluarga');
             const index = button.getAttribute('data-index');
+            
+            // Add to deleted keluarga list
+            const deletedInput = document.getElementById('deleted_keluarga');
+            if (deletedInput.value) {
+                deletedInput.value += ',' + index;
+            } else {
+                deletedInput.value = index;
+            }
+            
             removeKeluarga(index);
         }
     });

@@ -65,6 +65,17 @@ class User extends Authenticatable
         return $this->morphMany(Alamat::class, 'owner')->where('tipe', 'domisili');
     }
 
+    // Single address access methods
+    public function getAlamatKtpAttribute()
+    {
+        return $this->alamats()->where('tipe', 'ktp')->first();
+    }
+
+    public function getAlamatDomisiliAttribute()
+    {
+        return $this->alamats()->where('tipe', 'domisili')->first();
+    }
+
     public function golonganDarah()
     {
         return $this->belongsTo(GolonganDarah::class, 'golongan_darah_id');

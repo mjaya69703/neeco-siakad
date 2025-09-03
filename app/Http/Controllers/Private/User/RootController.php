@@ -46,6 +46,9 @@ class RootController extends Controller
         $data['kewarganegaraans'] = Kewarganegaraan::all();
         $data['golonganDarahs'] = GolonganDarah::all();
 
+        // Load user with related data including addresses
+        $user->load(['alamats', 'pendidikans', 'keluargas']);
+
         return view('private.profile-index', $data, compact('user'));
     }
 

@@ -101,4 +101,20 @@ class UpdateProfileRequest extends FormRequest
             }
         });
     }
+    
+    public function prepareForValidation()
+    {
+        // Clean up empty arrays
+        if ($this->pendidikan && is_array($this->pendidikan)) {
+            $this->pendidikan = array_filter($this->pendidikan, function($item) {
+                return !empty(array_filter($item));
+            });
+        }
+        
+        if ($this->keluarga && is_array($this->keluarga)) {
+            $this->keluarga = array_filter($this->keluarga, function($item) {
+                return !empty(array_filter($item));
+            });
+        }
+    }
 }
