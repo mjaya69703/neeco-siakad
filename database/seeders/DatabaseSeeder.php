@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             \Database\Seeders\PengaturanSeeder::class,
             \Database\Seeders\ReferensiSeeder::class,
             \Database\Seeders\UserSeeder::class,
+            \Database\Seeders\AkademikSeeder::class,
         ]);
     }
 }

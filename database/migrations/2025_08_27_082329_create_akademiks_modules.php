@@ -27,7 +27,6 @@ return new class extends Migration
             $table->unsignedBigInteger('updated_by')->nullable();
             $table->unsignedBigInteger('deleted_by')->nullable();
         });
-
         Schema::create('fakultas', function (Blueprint $table) {
             $table->id();
             $table->string('name');
@@ -58,7 +57,6 @@ return new class extends Migration
             $table->unsignedBigInteger('updated_by')->nullable();
             $table->unsignedBigInteger('deleted_by')->nullable();
         });
-
         Schema::create('fakultas_profile', function (Blueprint $table) {
             $table->id();
             $table->foreignId('fakultas_id')->constrained('fakultas');
@@ -80,7 +78,6 @@ return new class extends Migration
             $table->unsignedBigInteger('updated_by')->nullable();
             $table->unsignedBigInteger('deleted_by')->nullable();
         });
-
         Schema::create('program_studi', function (Blueprint $table) {
             $table->id();
             $table->foreignId('fakultas_id')->constrained('fakultas');
@@ -113,7 +110,6 @@ return new class extends Migration
             $table->unsignedBigInteger('updated_by')->nullable();
             $table->unsignedBigInteger('deleted_by')->nullable();
         });
-
         Schema::create('program_studi_profile', function (Blueprint $table) {
             $table->id();
             $table->foreignId('program_studi_id')->constrained('program_studi');
@@ -135,7 +131,6 @@ return new class extends Migration
             $table->unsignedBigInteger('updated_by')->nullable();
             $table->unsignedBigInteger('deleted_by')->nullable();
         });
-
         Schema::create('kurikulum', function (Blueprint $table) {
             $table->id();
             // Relasi inti
@@ -171,9 +166,9 @@ return new class extends Migration
             $table->unsignedBigInteger('updated_by')->nullable();
             $table->unsignedBigInteger('deleted_by')->nullable();
         });
-
         Schema::create('mata_kuliah', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('semester_id')->constrained('semesters');
 
             // Identitas mata kuliah
             $table->string('name');
@@ -190,7 +185,7 @@ return new class extends Migration
             
             // Prasyarat
             $table->integer('min_semester')->default(1);
-            $table->decimal('min_ipk', 3, 2)->nullable();
+            // $table->decimal('min_ipk', 3, 2)->nullable();
             
             // Status
             $table->boolean('is_active')->default(true);
@@ -249,14 +244,13 @@ return new class extends Migration
             $table->unsignedBigInteger('deleted_by')->nullable();
 
         });
-        
         Schema::create('kurikulum_mata_kuliah', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('kurikulum_id')->constrained('kurikulum')->onDelete('cascade');
-            $table->foreignId('mata_kuliah_id')->constrained('mata_kuliah')->onDelete('cascade');
+            $table->foreignId('kurikulum_id')->constrained('kurikulum');
+            $table->foreignId('mata_kuliah_id')->constrained('mata_kuliah');
+            $table->foreignId('semester_id')->constrained('semesters');
             
             // Penempatan dalam kurikulum
-            $table->integer('semester');
             $table->boolean('is_wajib')->default(true);
             $table->integer('urutan')->default(0);
             
@@ -272,10 +266,9 @@ return new class extends Migration
             // Unique constraint
             $table->unique(['kurikulum_id', 'mata_kuliah_id']);
         });
-
         Schema::create('kelas_perkuliahan', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('tahun_akademik_id')->constrained('kurikulum')->onDelete('cascade');
+            $table->foreignId('tahun_akademik_id')->constrained('tahun_akademik');
             $table->foreignId('program_studi_id')->constrained('program_studi');
             $table->foreignId('mata_kuliah_id')->nullable()->constrained('mata_kuliah'); 
     
@@ -290,7 +283,79 @@ return new class extends Migration
             $table->unsignedBigInteger('updated_by')->nullable();
             $table->unsignedBigInteger('deleted_by')->nullable();
         });
+        Schema::create('kelas_mahasiswa', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('kelas_id')->constrained('kelas_perkuliahan');
+            $table->foreignId('mahasiswa_id')->constrained('mahasiswas');
 
+            // Audit fields
+            $table->timestamps();
+            $table->softDeletes();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
+            $table->unsignedBigInteger('deleted_by')->nullable();
+        });
+        Schema::create('jadwal_perkuliahan', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('tahun_akademik_id')->constrained('tahun_akademik');
+            $table->foreignId('mata_kuliah_id')->constrained('mata_kuliah');
+            $table->foreignId('dosen_id')->constrained('users'); // Dosen Pengampu
+            $table->foreignId('ruang_id')->nullable()->constrained('ruangan');
+
+            $table->enum('hari', ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu']);
+            $table->time('jam_mulai');
+            $table->time('jam_selesai');
+            $table->enum('metode', ['Tatap Muka', 'Teleconference', 'Hybrid'])->default('Tatap Muka');
+            $table->enum('status', ['Terjadwal', 'Terlaksana', 'Ditunda', 'Dibatalkan'])->default('Terjadwal');
+
+            $table->string('code')->unique();
+            // Audit fields
+            $table->timestamps();
+            $table->softDeletes();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
+            $table->unsignedBigInteger('deleted_by')->nullable();
+        });
+        Schema::create('jadwal_kelas', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('jadwal_id')->constrained('jadwal_perkuliahan');
+            $table->foreignId('kelas_id')->constrained('kelas_perkuliahan');
+
+            $table->unique(['jadwal_id', 'kelas_id']);
+
+            // Audit fields
+            $table->timestamps();
+            $table->softDeletes();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
+            $table->unsignedBigInteger('deleted_by')->nullable();
+        });
+        Schema::create('jadwal_pertemuan', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('jadwal_id')->constrained('jadwal_perkuliahan');
+            
+            $table->integer('pertemuan_ke');
+            
+            // Override fields
+            $table->date('tanggal')->nullable();
+            $table->time('jam_mulai')->nullable();
+            $table->time('jam_selesai')->nullable();
+            $table->foreignId('ruang_id')->nullable()->constrained('ruangan');
+            $table->foreignId('dosen_id')->nullable()->constrained('users');  // Dosen yang mengajar
+            $table->enum('metode', ['Tatap Muka', 'Teleconference', 'Hybrid'])->nullable();
+
+            // Konten meeting
+            $table->string('link')->nullable(); // link zoom/teams/meet
+            $table->longText('materi')->nullable();
+            $table->boolean('is_realisasi')->default(false); // apakah pertemuan terlaksana
+
+            // Audit fields
+            $table->timestamps();
+            $table->softDeletes();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
+            $table->unsignedBigInteger('deleted_by')->nullable();
+        });
 
     }
 
@@ -306,10 +371,14 @@ return new class extends Migration
         Schema::dropIfExists('program_studi_profile');
         Schema::dropIfExists('kurikulum');
         Schema::dropIfExists('mata_kuliah');
+        Schema::dropIfExists('mata_kuliah_prasyarat');
         Schema::dropIfExists('mata_kuliah_dosen');
         Schema::dropIfExists('mata_kuliah_detail');
-        Schema::dropIfExists('mata_kuliah_prasyarat');
         Schema::dropIfExists('kurikulum_mata_kuliah');
         Schema::dropIfExists('kelas_perkuliahan');
+        Schema::dropIfExists('kelas_mahasiswa');
+        Schema::dropIfExists('jadwal_perkuliahan');
+        Schema::dropIfExists('jadwal_kelas');
+        Schema::dropIfExists('jadwal_pertemuan');
     }
 };

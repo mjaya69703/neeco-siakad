@@ -146,6 +146,42 @@
 
 
 
+    <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle {{ request()->routeIs('akademik*') ? 'show' : '' }}" href="#navbar-akademik" data-bs-toggle="dropdown" data-bs-auto-close="outside"
+            role="button" aria-expanded="{{ request()->routeIs('akademik*') ? 'true' : 'false' }}">
+            <span class="nav-link-icon d-md-none d-lg-inline-block">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round" class="icon icon-1">
+                    <path d="M3 12h1l3 8l3 -16l3 16l3 -8h4" />
+                    <path d="M4 4l1 1" />
+                    <path d="M18 5l1 -1" />
+                    <path d="M17 10l1 1" />
+                    <path d="M13 10l1 1" />
+                    <path d="M9 10l1 1" />
+                    <path d="M5 10l1 1" />
+                </svg>
+            </span>
+            <span class="nav-link-title">Master Akademik</span>
+        </a>
+        <div class="dropdown-menu {{ request()->routeIs('akademik*') ? 'show' : '' }}">
+            <div class="dropdown-menu-columns">
+                <div class="dropdown-menu-column">
+                    <a class="dropdown-item {{ request()->routeIs('akademik.tahun-akademik*') ? 'active' : '' }}" href="{{ route('akademik.tahun-akademik-index') }}">Tahun Akademik</a>
+                    <a class="dropdown-item {{ request()->routeIs('akademik.fakultas*') ? 'active' : '' }}" href="{{ route('akademik.fakultas-index') }}">Fakultas</a>
+                    <a class="dropdown-item {{ request()->routeIs('akademik.program-studi*') ? 'active' : '' }}" href="{{ route('akademik.program-studi-index') }}">Program Studi</a>
+                    <a class="dropdown-item {{ request()->routeIs('akademik.kurikulum*') ? 'active' : '' }}" href="{{ route('akademik.kurikulum-index') }}">Kurikulum</a>
+                    <a class="dropdown-item {{ request()->routeIs('akademik.mata-kuliah*') ? 'active' : '' }}" href="{{ route('akademik.mata-kuliah-index') }}">Mata Kuliah</a>
+                    <a class="dropdown-item {{ request()->routeIs('akademik.kurikulum-mata-kuliah*') ? 'active' : '' }}" href="{{ route('akademik.kurikulum-mata-kuliah-index') }}">Kurikulum Mata Kuliah</a>
+                    <a class="dropdown-item {{ request()->routeIs('akademik.kelas-perkuliahan*') ? 'active' : '' }}" href="{{ route('akademik.kelas-perkuliahan-index') }}">Kelas Perkuliahan</a>
+                    <a class="dropdown-item {{ request()->routeIs('akademik.jadwal-perkuliahan*') ? 'active' : '' }}" href="{{ route('akademik.jadwal-perkuliahan-index') }}">Jadwal Perkuliahan</a>
+                    <a class="dropdown-item {{ request()->routeIs('akademik.jadwal-pertemuan*') ? 'active' : '' }}" href="{{ route('akademik.jadwal-pertemuan-index') }}">Jadwal Pertemuan</a>
+                    <a class="dropdown-item {{ request()->routeIs('akademik.kelas-mahasiswa*') ? 'active' : '' }}" href="{{ route('akademik.kelas-mahasiswa-index') }}">Kelas Mahasiswa</a>
+                </div>
+            </div>
+        </div>
+    </li>
+
     <li class="nav-item">
         <a class="nav-link" href="#">
             <span class="nav-link-title">Lainnya</span>
