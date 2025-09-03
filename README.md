@@ -20,14 +20,48 @@ Neco Siakad (**New Ecosystem - Sistem Informasi Akademik**) adalah sistem inform
 
 ## ✨ Fitur Utama
 
-- 🔐 **Sistem Autentikasi & Otorisasi** - Manajemen user dengan role-based access control
-- 👥 **Manajemen Pengguna** - Mahasiswa, Dosen, dan Staff administrasi
-- 📚 **Manajemen Akademik** - Kurikulum, mata kuliah, dan jadwal perkuliahan
-- 📊 **Sistem Penilaian** - Input dan monitoring nilai akademik
-- 📋 **Registrasi & KRS** - Sistem registrasi dan pengisian KRS online
-- 📈 **Reporting & Analytics** - Laporan akademik dan dashboard analytics
-- ⚙️ **Pengaturan Sistem** - Konfigurasi kampus dan aplikasi yang fleksibel
-- 📱 **Responsive Design** - Interface yang mobile-friendly
+### 🔐 Sistem Autentikasi & Otorisasi ✅
+- Manajemen user dengan role-based access control
+- Sistem login/logout yang aman
+- Proteksi terhadap CSRF attacks
+- Two Factor Authentication (2FA) support
+- Dukungan multi-user (Admin, Dosen, Mahasiswa - dengan struktur terpisah)
+
+### 👥 Manajemen Pengguna ✅
+- Profil pengguna lengkap dengan foto
+- Manajemen data pribadi (alamat KTP & domisili, pendidikan, keluarga)
+- Pembatasan: Setiap user hanya boleh memiliki 1 alamat KTP dan 1 alamat domisili
+- Setiap user dapat memiliki banyak data pendidikan dan keluarga
+- Manajemen kontak dan media sosial
+
+### 📚 Manajemen Akademik 🚧 *(Coming Soon)*
+- Kurikulum dan mata kuliah
+- Jadwal perkuliahan
+- Sistem registrasi dan KRS online
+- Manajemen kelas dan ruangan
+
+### 📊 Sistem Penilaian 🚧 *(Coming Soon)*
+- Input dan monitoring nilai akademik
+- Sistem KHS (Kartu Hasil Studi)
+- Laporan akademik dan dashboard analytics
+
+### 🏢 Manajemen Infrastruktur ✅
+- Gedung dan ruangan kampus
+- Inventaris barang
+- Sistem pemeliharaan dan perawatan
+- Transaksi barang (peminjaman, pengecekan, pengajuan perbaikan)
+- Riwayat perbaikan dan histori pemeliharaan
+
+### ⚙️ Pengaturan Sistem ✅
+- Konfigurasi kampus dan aplikasi yang fleksibel
+- Manajemen tahun akademik dan semester
+- Manajemen referensi data (agama, golongan darah, jenis kelamin, kewarganegaraan, jabatan, role)
+- Pengaturan sistem dan kampus
+
+### 📱 Responsive Design ✅
+- Interface yang mobile-friendly
+- Dashboard yang informatif
+- Navigasi yang intuitif
 
 ## 🛠️ Technology Stack
 
@@ -101,6 +135,18 @@ Neco Siakad (**New Ecosystem - Sistem Informasi Akademik**) adalah sistem inform
    npm run dev
    ```
 
+## 🔐 Informasi Login Default
+
+Setelah menjalankan proses instalasi dan seeding database, sistem akan menyediakan akun default untuk testing:
+
+### Administrator
+- **Username**: superuser
+- **Email**: superuser@example.com
+- **Password**: admin123
+
+> ⚠️ **PENTING**: Ganti password default ini setelah instalasi untuk keamanan sistem.
+> Untuk akun dosen dan mahasiswa, perlu dibuat melalui sistem administrasi setelah login dengan akun administrator.
+
 ## 📝 Usage
 
 ### Development Mode
@@ -144,12 +190,18 @@ neeco-siakad/
 ├── app/
 │   ├── Http/Controllers/     # Application controllers
 │   ├── Models/              # Eloquent models
+│   │   ├── Infra/           # Infrastructure models
+│   │   ├── Inventaris/      # Inventory models
+│   │   ├── Mahasiswa/       # Student-related models
 │   │   ├── Pengaturan/      # Settings models
-│   │   └── Referensi/       # Reference data models
+│   │   ├── Perawatan/       # Maintenance models
+│   │   ├── Referensi/       # Reference data models
+│   │   ├── Transaksi/       # Transaction models
+│   │   └── User/            # User-related models
 │   └── Providers/           # Service providers
 ├── database/
 │   ├── migrations/          # Database migrations
-│   └── seeders/            # Database seeders
+│   └── seeders/             # Database seeders
 ├── resources/
 │   ├── views/              # Blade templates
 │   ├── css/                # Stylesheets

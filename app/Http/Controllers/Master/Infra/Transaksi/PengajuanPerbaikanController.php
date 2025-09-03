@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Master\Infra\Inventaris;
+namespace App\Http\Controllers\Master\Infra\Transaksi;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
